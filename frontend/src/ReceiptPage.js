@@ -14,7 +14,7 @@ function ReceiptPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/receipts/${id}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/receipts/${id}`);
         setData(response.data);
         setQrData(`${window.location.origin}/receipt/${id}?download=true`);
         const urlParams = new URLSearchParams(window.location.search);

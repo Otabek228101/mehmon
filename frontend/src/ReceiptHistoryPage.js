@@ -23,7 +23,7 @@ function ReceiptHistoryPage() {
 
   const fetchReceipts = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/receipts");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/receipts`);
       setReceipts(response.data);
       setFilteredReceipts(response.data);
       setLoading(false);
@@ -35,7 +35,7 @@ function ReceiptHistoryPage() {
 
   const searchReceipts = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/receipts/search?q=${searchQuery}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/receipts/search?q=${searchQuery}`);
       setFilteredReceipts(response.data);
     } catch (error) {
       console.error("Error searching receipts:", error);

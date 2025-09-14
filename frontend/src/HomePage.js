@@ -33,11 +33,11 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/hotels")
+    axios.get(`${process.env.REACT_APP_API_URL}/api/hotels`)
       .then((res) => setHotels(res.data))
       .catch(err => console.error("Error loading hotels:", err));
     
-    axios.get("http://localhost:8080/api/car-rentals")
+    axios.get(`${process.env.REACT_APP_API_URL}/api/car-rentals`)
       .then((res) => setCarRentals(res.data))
       .catch(err => console.error("Error loading car rentals:", err));
   }, []);
@@ -171,7 +171,7 @@ function HomePage() {
         amountPaid: totalAmount,
       };
       
-      const response = await axios.post("http://localhost:8080/api/receipts", receiptData);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/receipts`, receiptData);
       const savedData = response.data;
       setGenerated(savedData);
       localStorage.setItem("receiptData", JSON.stringify(savedData));
