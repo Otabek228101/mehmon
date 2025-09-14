@@ -67,18 +67,6 @@ function ReceiptPage() {
     y += 7;
     doc.text(`Date: ${formatDate(getValue(receiptData, ['receiptDate', 'receipt_date']))}`, 10, y);
     y += 15;
-    doc.text("BOOKING DETAILS", 10, y);
-    y += 10;
-    doc.text(`Property name: ${getValue(receiptData, ['propertyName', 'property_name']) || "Multiple Properties"}`, 10, y);
-    y += 7;
-    doc.text(`Property address: ${getValue(receiptData, ['propertyAddress', 'property_address']) || "Various Locations"}`, 10, y);
-    y += 7;
-    doc.text(`Check-in: ${formatDate(getValue(receiptData, ['checkIn', 'check_in']))}`, 10, y);
-    y += 7;
-    doc.text(`Check-out: ${formatDate(getValue(receiptData, ['checkOut', 'check_out']))}`, 10, y);
-    y += 7;
-    doc.text(`Amount paid: €${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`, 10, y);
-    y += 15;
     if (receiptData.activities && receiptData.activities.length > 0) {
       doc.text("ACTIVITIES", 10, y);
       y += 10;
