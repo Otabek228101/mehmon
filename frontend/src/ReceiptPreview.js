@@ -1,6 +1,6 @@
 import logo from "./logoBlack.png"; 
 import { QRCodeSVG } from 'qrcode.react';
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 import QRCode from 'qrcode';
 
@@ -47,7 +47,7 @@ function ReceiptPreview({ data, onClick }) {
     
     autoTable(doc, {
       startY: 40,
-      head: [['YOUR DETAILS']],
+      head: [['YOUR DETAILS', '']],
       body: [
         ['Name', getValue(data, ['clientName', 'client_name'])],
         ['Email', getValue(data, ['clientEmail', 'client_email'])],
@@ -65,51 +65,41 @@ function ReceiptPreview({ data, onClick }) {
     if (data.activities && data.activities.length > 0) {
       data.activities.forEach((activity, index) => {
         const activityRows = [];
-        activityRows.push([`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']);
         
-        const propertyName = getValue(activity, ['propertyName', 'property_name']);
-        if (propertyName) {
-          activityRows.push(['Property', propertyName]);
+        if (getValue(activity, ['propertyName', 'property_name'])) {
+          activityRows.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
         }
         
-        const propertyAddress = getValue(activity, ['propertyAddress', 'property_address']);
-        if (propertyAddress) {
-          activityRows.push(['Address', propertyAddress]);
+        if (getValue(activity, ['propertyAddress', 'property_address'])) {
+          activityRows.push(['Address', getValue(activity, ['propertyAddress', 'property_address'])]);
         }
         
-        const checkIn = getValue(activity, ['checkIn', 'check_in']);
-        if (checkIn) {
-          activityRows.push(['Check-in', formatDate(checkIn)]);
+        if (getValue(activity, ['checkIn', 'check_in'])) {
+          activityRows.push(['Check-in', formatDate(getValue(activity, ['checkIn', 'check_in']))]);
         }
         
-        const checkOut = getValue(activity, ['checkOut', 'check_out']);
-        if (checkOut) {
-          activityRows.push(['Check-out', formatDate(checkOut)]);
+        if (getValue(activity, ['checkOut', 'check_out'])) {
+          activityRows.push(['Check-out', formatDate(getValue(activity, ['checkOut', 'check_out']))]);
         }
         
-        const carModel = getValue(activity, ['carModel', 'car_model']);
-        if (carModel) {
-          activityRows.push(['Car Model', carModel]);
+        if (getValue(activity, ['carModel', 'car_model'])) {
+          activityRows.push(['Car Model', getValue(activity, ['carModel', 'car_model'])]);
         }
         
-        const carPlate = getValue(activity, ['carPlate', 'car_plate']);
-        if (carPlate) {
-          activityRows.push(['Car Plate', carPlate]);
+        if (getValue(activity, ['carPlate', 'car_plate'])) {
+          activityRows.push(['Car Plate', getValue(activity, ['carPlate', 'car_plate'])]);
         }
         
-        const pickupLocation = getValue(activity, ['pickupLocation', 'pickup_location']);
-        if (pickupLocation) {
-          activityRows.push(['Pickup', pickupLocation]);
+        if (getValue(activity, ['pickupLocation', 'pickup_location'])) {
+          activityRows.push(['Pickup', getValue(activity, ['pickupLocation', 'pickup_location'])]);
         }
         
-        const dropoffLocation = getValue(activity, ['dropoffLocation', 'dropoff_location']);
-        if (dropoffLocation) {
-          activityRows.push(['Dropoff', dropoffLocation]);
+        if (getValue(activity, ['dropoffLocation', 'dropoff_location'])) {
+          activityRows.push(['Dropoff', getValue(activity, ['dropoffLocation', 'dropoff_location'])]);
         }
         
-        const transferType = getValue(activity, ['transferType', 'transfer_type']);
-        if (transferType) {
-          activityRows.push(['Transfer Type', transferType]);
+        if (getValue(activity, ['transferType', 'transfer_type'])) {
+          activityRows.push(['Transfer Type', getValue(activity, ['transferType', 'transfer_type'])]);
         }
         
         if (activity.description) {
@@ -120,7 +110,7 @@ function ReceiptPreview({ data, onClick }) {
 
         autoTable(doc, {
           startY: y,
-          head: [[`ACTIVITY ${index + 1}`]],
+          head: [[`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']],
           body: activityRows,
           theme: 'grid',
           styles: { fontSize: 10, cellPadding: 2 },
@@ -139,7 +129,7 @@ function ReceiptPreview({ data, onClick }) {
         startY: y,
         body: [['Total Amount', `€${parseFloat(getValue(data, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`]],
         theme: 'grid',
-        styles: { fontSize: 10, cellPadding: 2, fontStyle: 'bold' },
+        styles: { fontSize: 12, cellPadding: 3, fontStyle: 'bold' },
         margin: { left: 10, right: 10 },
       });
 
@@ -150,15 +140,15 @@ function ReceiptPreview({ data, onClick }) {
       }
     }
 
-    doc.setFontSize(8);
+    doc.setFontSize(10);
     doc.text("Your receipt is automatically generated. This is proof of your transaction – you can't use it to claim VAT.", 10, y, { maxWidth: 180 });
-    y += 10;
+    y += 15;
     if (y > 250) {
       doc.addPage();
       y = 10;
     }
     doc.text("Note: This isn't an invoice. A valid invoice for tax purposes can only be issued by the property.", 10, y, { maxWidth: 180 });
-    y += 10;
+    y += 15;
     if (y > 250) {
       doc.addPage();
       y = 10;
@@ -182,6 +172,7 @@ function ReceiptPreview({ data, onClick }) {
       console.error(err);
     }
 
+    // Add contact info
     doc.setFontSize(10);
     doc.text("Contact Us:", 10, y);
     y += 5;
@@ -217,6 +208,17 @@ function ReceiptPreview({ data, onClick }) {
           <tr><td><strong>Email:</strong></td><td>{getValue(data, ['clientEmail', 'client_email'])}</td></tr>
           <tr><td><strong>Phone:</strong></td><td>{getValue(data, ['clientPhone', 'client_phone'])}</td></tr>
           <tr><td><strong>Date:</strong></td><td>{formatDate(getValue(data, ['receiptDate', 'receipt_date']))}</td></tr>
+        </tbody>
+      </table>
+      
+      <h6 className="mb-2">BOOKING DETAILS</h6>
+      <table className="table table-borderless">
+        <tbody>
+          <tr><td><strong>Property name:</strong></td><td>{getValue(data, ['propertyName', 'property_name']) || "Multiple Properties"}</td></tr>
+          <tr><td><strong>Property address:</strong></td><td>{getValue(data, ['propertyAddress', 'property_address']) || "Various Locations"}</td></tr>
+          <tr><td><strong>Check-in:</strong></td><td>{formatDate(getValue(data, ['checkIn', 'check_in']))}</td></tr>
+          <tr><td><strong>Check-out:</strong></td><td>{formatDate(getValue(data, ['checkOut', 'check_out']))}</td></tr>
+          <tr><td><strong>Amount paid:</strong></td><td>€{parseFloat(getValue(data, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}</td></tr>
         </tbody>
       </table>
 
@@ -352,4 +354,4 @@ function ReceiptPreview({ data, onClick }) {
   );
 }
 
-export default ReceiptPreview;
+export default ReceiptPreview

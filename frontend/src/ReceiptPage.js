@@ -53,18 +53,14 @@ function ReceiptPage() {
     
     const doc = new jsPDF();
     
-    // Add logo
     doc.addImage(logo, 'PNG', 10, 10, 50, 12);
     
-    // Add booking number
     doc.setFontSize(16);
     doc.text(`Booking Number ${getValue(receiptData, ['receiptNumber', 'receipt_number'])}`, 200, 20, { align: 'right' });
     
-    // Add receipt title
     doc.setFontSize(12);
     doc.text("This is your receipt", 10, 30);
     
-    // Add client details table
     autoTable(doc, {
       startY: 40,
       head: [['YOUR DETAILS', '']],
@@ -82,26 +78,6 @@ function ReceiptPage() {
 
     let y = doc.lastAutoTable.finalY + 10;
 
-    // Add booking details table
-    autoTable(doc, {
-      startY: y,
-      head: [['BOOKING DETAILS', '']],
-      body: [
-        ['Property name', getValue(receiptData, ['propertyName', 'property_name']) || "Multiple Properties"],
-        ['Property address', getValue(receiptData, ['propertyAddress', 'property_address']) || "Various Locations"],
-        ['Check-in', formatDate(getValue(receiptData, ['checkIn', 'check_in']))],
-        ['Check-out', formatDate(getValue(receiptData, ['checkOut', 'check_out']))],
-        ['Amount paid', `€${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`],
-      ],
-      theme: 'grid',
-      styles: { fontSize: 10, cellPadding: 2 },
-      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold' },
-      margin: { left: 10, right: 10 },
-    });
-
-    y = doc.lastAutoTable.finalY + 10;
-
-    // Add activities if they exist
     if (receiptData.activities && receiptData.activities.length > 0) {
       receiptData.activities.forEach((activity, index) => {
         const activityRows = [];
