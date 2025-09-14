@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 import logo from "./logoBlack.png";
 import { QRCodeSVG } from 'qrcode.react';
@@ -39,7 +39,6 @@ function ReceiptPage() {
     return date.toLocaleDateString('en-GB');
   };
 
-  // Простая функция getValue как в рабочих файлах
   const getValue = (obj, keys) => {
     for (const key of keys) {
       if (obj && obj[key] !== undefined && obj[key] !== null) {
@@ -54,17 +53,21 @@ function ReceiptPage() {
     
     const doc = new jsPDF();
     
+    // Add logo
     doc.addImage(logo, 'PNG', 10, 10, 50, 12);
     
+    // Add booking number
     doc.setFontSize(16);
     doc.text(`Booking Number ${getValue(receiptData, ['receiptNumber', 'receipt_number'])}`, 200, 20, { align: 'right' });
     
+    // Add receipt title
     doc.setFontSize(12);
     doc.text("This is your receipt", 10, 30);
     
+    // Add client details table
     autoTable(doc, {
       startY: 40,
-      head: [['YOUR DETAILS']],
+      head: [['YOUR DETAILS', '']],
       body: [
         ['Name', getValue(receiptData, ['clientName', 'client_name'])],
         ['Email', getValue(receiptData, ['clientEmail', 'client_email'])],
@@ -79,12 +82,30 @@ function ReceiptPage() {
 
     let y = doc.lastAutoTable.finalY + 10;
 
+    // Add booking details table
+    autoTable(doc, {
+      startY: y,
+      head: [['BOOKING DETAILS', '']],
+      body: [
+        ['Property name', getValue(receiptData, ['propertyName', 'property_name']) || "Multiple Properties"],
+        ['Property address', getValue(receiptData, ['propertyAddress', 'property_address']) || "Various Locations"],
+        ['Check-in', formatDate(getValue(receiptData, ['checkIn', 'check_in']))],
+        ['Check-out', formatDate(getValue(receiptData, ['checkOut', 'check_out']))],
+        ['Amount paid', `€${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 2 },
+      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold' },
+      margin: { left: 10, right: 10 },
+    });
+
+    y = doc.lastAutoTable.finalY + 10;
+
+    // Add activities if they exist
     if (receiptData.activities && receiptData.activities.length > 0) {
       receiptData.activities.forEach((activity, index) => {
         const activityRows = [];
-        activityRows.push([`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']);
         
-        // Используем прямое обращение к свойствам как в рабочих файлах
         if (getValue(activity, ['propertyName', 'property_name'])) {
           activityRows.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
         }
@@ -129,7 +150,7 @@ function ReceiptPage() {
 
         autoTable(doc, {
           startY: y,
-          head: [[`ACTIVITY ${index + 1}`]],
+          head: [[`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']],
           body: activityRows,
           theme: 'grid',
           styles: { fontSize: 10, cellPadding: 2 },
@@ -144,11 +165,12 @@ function ReceiptPage() {
         }
       });
 
+      // Add total amount
       autoTable(doc, {
         startY: y,
         body: [['Total Amount', `€${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`]],
         theme: 'grid',
-        styles: { fontSize: 10, cellPadding: 2, fontStyle: 'bold' },
+        styles: { fontSize: 12, cellPadding: 3, fontStyle: 'bold' },
         margin: { left: 10, right: 10 },
       });
 
@@ -159,20 +181,22 @@ function ReceiptPage() {
       }
     }
 
-    doc.setFontSize(8);
+    // Add footer text
+    doc.setFontSize(10);
     doc.text("Your receipt is automatically generated. This is proof of your transaction – you can't use it to claim VAT.", 10, y, { maxWidth: 180 });
-    y += 10;
+    y += 15;
     if (y > 250) {
       doc.addPage();
       y = 10;
     }
     doc.text("Note: This isn't an invoice. A valid invoice for tax purposes can only be issued by the property.", 10, y, { maxWidth: 180 });
-    y += 10;
+    y += 15;
     if (y > 250) {
       doc.addPage();
       y = 10;
     }
 
+    // Add QR Code
     try {
       const url = await new Promise((resolve, reject) => {
         QRCode.toDataURL(`${window.location.origin}/receipt/${receiptData.id}?download=true`, { errorCorrectionLevel: 'H', width: 128 }, (err, url) => {
@@ -191,6 +215,7 @@ function ReceiptPage() {
       console.error(err);
     }
 
+    // Add contact info
     doc.setFontSize(10);
     doc.text("Contact Us:", 10, y);
     y += 5;
@@ -223,6 +248,17 @@ function ReceiptPage() {
               <tr><td><strong>Email:</strong></td><td>{getValue(data, ['clientEmail', 'client_email'])}</td></tr>
               <tr><td><strong>Phone:</strong></td><td>{getValue(data, ['clientPhone', 'client_phone'])}</td></tr>
               <tr><td><strong>Date:</strong></td><td>{formatDate(getValue(data, ['receiptDate', 'receipt_date']))}</td></tr>
+            </tbody>
+          </table>
+          
+          <h6 className="mb-2">BOOKING DETAILS</h6>
+          <table className="table table-borderless">
+            <tbody>
+              <tr><td><strong>Property name:</strong></td><td>{getValue(data, ['propertyName', 'property_name']) || "Multiple Properties"}</td></tr>
+              <tr><td><strong>Property address:</strong></td><td>{getValue(data, ['propertyAddress', 'property_address']) || "Various Locations"}</td></tr>
+              <tr><td><strong>Check-in:</strong></td><td>{formatDate(getValue(data, ['checkIn', 'check_in']))}</td></tr>
+              <tr><td><strong>Check-out:</strong></td><td>{formatDate(getValue(data, ['checkOut', 'check_out']))}</td></tr>
+              <tr><td><strong>Amount paid:</strong></td><td>€{parseFloat(getValue(data, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}</td></tr>
             </tbody>
           </table>
 
