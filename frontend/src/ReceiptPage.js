@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
+import 'jspdf-autotable';
 import logo from "./logoBlack.png";
 import { QRCodeSVG } from 'qrcode.react';
 import axios from "axios";
@@ -49,99 +50,114 @@ function ReceiptPage() {
   const downloadPDF = async (receiptData) => {
     if (!receiptData) return;
     const doc = new jsPDF();
+    
     doc.addImage(logo, 'PNG', 10, 10, 50, 12);
-    let y = 30;
+    
     doc.setFontSize(16);
-    doc.text(`Booking Number ${getValue(receiptData, ['receiptNumber', 'receipt_number'])}`, 140, y, { align: 'right' });
-    y += 10;
+    doc.text(`Booking Number ${getValue(receiptData, ['receiptNumber', 'receipt_number'])}`, 200, 20, { align: 'right' });
+    
     doc.setFontSize(12);
-    doc.text("This is your receipt", 10, y);
-    y += 15;
-    doc.text("YOUR DETAILS", 10, y);
-    y += 10;
-    doc.text(`Name: ${getValue(receiptData, ['clientName', 'client_name'])}`, 10, y);
-    y += 7;
-    doc.text(`Email: ${getValue(receiptData, ['clientEmail', 'client_email'])}`, 10, y);
-    y += 7;
-    doc.text(`Phone: ${getValue(receiptData, ['clientPhone', 'client_phone'])}`, 10, y);
-    y += 7;
-    doc.text(`Date: ${formatDate(getValue(receiptData, ['receiptDate', 'receipt_date']))}`, 10, y);
-    y += 15;
+    doc.text("This is your receipt", 10, 30);
+    
+    doc.autoTable({
+      startY: 40,
+      head: [['YOUR DETAILS']],
+      body: [
+        ['Name', getValue(receiptData, ['clientName', 'client_name'])],
+        ['Email', getValue(receiptData, ['clientEmail', 'client_email'])],
+        ['Phone', getValue(receiptData, ['clientPhone', 'client_phone'])],
+        ['Date', formatDate(getValue(receiptData, ['receiptDate', 'receipt_date']))],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 2 },
+      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold' },
+      margin: { left: 10, right: 10 },
+    });
+
+    let y = doc.lastAutoTable.finalY + 10;
+
     if (receiptData.activities && receiptData.activities.length > 0) {
-      doc.text("ACTIVITIES", 10, y);
-      y += 10;
       receiptData.activities.forEach((activity, index) => {
-        doc.text(`${activity.type} - Activity ${index + 1}`, 10, y);
-        y += 7;
+        const activityRows = [];
+        activityRows.push([`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']);
         if (getValue(activity, ['propertyName', 'property_name'])) {
-          doc.text(`Property: ${getValue(activity, ['propertyName', 'property_name'])}`, 15, y);
-          y += 7;
+          activityRows.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
         }
         if (getValue(activity, ['propertyAddress', 'property_address'])) {
-          doc.text(`Address: ${getValue(activity, ['propertyAddress', 'property_address'])}`, 15, y);
-          y += 7;
+          activityRows.push(['Address', getValue(activity, ['propertyAddress', 'property_address'])]);
         }
         if (getValue(activity, ['checkIn', 'check_in'])) {
-          doc.text(`Check-in: ${formatDate(getValue(activity, ['checkIn', 'check_in']))}`, 15, y);
-          y += 7;
+          activityRows.push(['Check-in', formatDate(getValue(activity, ['checkIn', 'check_in']))]);
         }
         if (getValue(activity, ['checkOut', 'check_out'])) {
-          doc.text(`Check-out: ${formatDate(getValue(activity, ['checkOut', 'check_out']))}`, 15, y);
-          y += 7;
+          activityRows.push(['Check-out', formatDate(getValue(activity, ['checkOut', 'check_out']))]);
         }
         if (getValue(activity, ['carModel', 'car_model'])) {
-          doc.text(`Car Model: ${getValue(activity, ['carModel', 'car_model'])}`, 15, y);
-          y += 7;
+          activityRows.push(['Car Model', getValue(activity, ['carModel', 'car_model'])]);
         }
         if (getValue(activity, ['carPlate', 'car_plate'])) {
-          doc.text(`Car Plate: ${getValue(activity, ['carPlate', 'car_plate'])}`, 15, y);
-          y += 7;
+          activityRows.push(['Car Plate', getValue(activity, ['carPlate', 'car_plate'])]);
         }
         if (getValue(activity, ['pickupLocation', 'pickup_location'])) {
-          doc.text(`Pickup: ${getValue(activity, ['pickupLocation', 'pickup_location'])}`, 15, y);
-          y += 7;
+          activityRows.push(['Pickup', getValue(activity, ['pickupLocation', 'pickup_location'])]);
         }
         if (getValue(activity, ['dropoffLocation', 'dropoff_location'])) {
-          doc.text(`Dropoff: ${getValue(activity, ['dropoffLocation', 'dropoff_location'])}`, 15, y);
-          y += 7;
+          activityRows.push(['Dropoff', getValue(activity, ['dropoffLocation', 'dropoff_location'])]);
         }
         if (getValue(activity, ['transferType', 'transfer_type'])) {
-          doc.text(`Transfer Type: ${getValue(activity, ['transferType', 'transfer_type'])}`, 15, y);
-          y += 7;
+          activityRows.push(['Transfer Type', getValue(activity, ['transferType', 'transfer_type'])]);
         }
         if (activity.description) {
-          doc.text(`Description: ${activity.description}`, 15, y);
-          y += 7;
+          activityRows.push(['Description', activity.description]);
         }
-        doc.text(`Amount: €${parseFloat(activity.amount || 0).toFixed(2)}`, 15, y);
-        y += 10;
+        activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
+
+        doc.autoTable({
+          startY: y,
+          head: [[`ACTIVITY ${index + 1}`]],
+          body: activityRows,
+          theme: 'grid',
+          styles: { fontSize: 10, cellPadding: 2 },
+          headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold' },
+          margin: { left: 10, right: 10 },
+        });
+
+        y = doc.lastAutoTable.finalY + 10;
         if (y > 250) {
           doc.addPage();
           y = 10;
         }
       });
-      doc.text(`Total Amount: €${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`, 10, y);
-      y += 15;
+
+      doc.autoTable({
+        startY: y,
+        body: [['Total Amount', `€${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`]],
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 2, fontStyle: 'bold' },
+        margin: { left: 10, right: 10 },
+      });
+
+      y = doc.lastAutoTable.finalY + 10;
       if (y > 250) {
         doc.addPage();
         y = 10;
       }
     }
-    doc.setFontSize(10);
+
+    doc.setFontSize(8);
     doc.text("Your receipt is automatically generated. This is proof of your transaction – you can't use it to claim VAT.", 10, y, { maxWidth: 180 });
-    y += 15;
+    y += 10;
     if (y > 250) {
       doc.addPage();
       y = 10;
     }
     doc.text("Note: This isn't an invoice. A valid invoice for tax purposes can only be issued by the property.", 10, y, { maxWidth: 180 });
-    y += 15;
+    y += 10;
     if (y > 250) {
       doc.addPage();
       y = 10;
     }
 
-    // Add QR Code
     try {
       const url = await new Promise((resolve, reject) => {
         QRCode.toDataURL(`${window.location.origin}/receipt/${receiptData.id}?download=true`, { errorCorrectionLevel: 'H', width: 128 }, (err, url) => {
@@ -151,11 +167,23 @@ function ReceiptPage() {
       });
       doc.addImage(url, 'PNG', 10, y, 40, 40);
       doc.text("Scan to download PDF", 10, y + 45);
+      y += 55;
+      if (y > 250) {
+        doc.addPage();
+        y = 10;
+      }
     } catch (err) {
       console.error(err);
-    } finally {
-      doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
     }
+
+    doc.setFontSize(10);
+    doc.text("Contact Us:", 10, y);
+    y += 5;
+    doc.text("Phone: +998900091090, +393751060001", 10, y);
+    y += 5;
+    doc.text("Telegram: https://t.me/mehmon_contact", 10, y);
+    
+    doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
   };
 
   if (!data) {
@@ -180,17 +208,6 @@ function ReceiptPage() {
               <tr><td><strong>Email:</strong></td><td>{getValue(data, ['clientEmail', 'client_email'])}</td></tr>
               <tr><td><strong>Phone:</strong></td><td>{getValue(data, ['clientPhone', 'client_phone'])}</td></tr>
               <tr><td><strong>Date:</strong></td><td>{formatDate(getValue(data, ['receiptDate', 'receipt_date']))}</td></tr>
-            </tbody>
-          </table>
-          
-          <h6 className="mb-2">BOOKING DETAILS</h6>
-          <table className="table table-borderless">
-            <tbody>
-              <tr><td><strong>Property name:</strong></td><td>{getValue(data, ['propertyName', 'property_name']) || "Multiple Properties"}</td></tr>
-              <tr><td><strong>Property address:</strong></td><td>{getValue(data, ['propertyAddress', 'property_address']) || "Various Locations"}</td></tr>
-              <tr><td><strong>Check-in:</strong></td><td>{formatDate(getValue(data, ['checkIn', 'check_in']))}</td></tr>
-              <tr><td><strong>Check-out:</strong></td><td>{formatDate(getValue(data, ['checkOut', 'check_out']))}</td></tr>
-              <tr><td><strong>Amount paid:</strong></td><td>€{parseFloat(getValue(data, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}</td></tr>
             </tbody>
           </table>
 
