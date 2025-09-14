@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/Otabek228101/mehmon/models"
@@ -14,7 +15,7 @@ var DB *gorm.DB
 
 func Connect() {
 	var err error
-	dsn := "host=localhost user=postgres password=postgres dbname=receipts port=5432 sslmode=disable"
+	dsn := os.Getenv("DATABASE_URL")
 
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
