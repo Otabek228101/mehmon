@@ -39,25 +39,13 @@ function ReceiptPage() {
     return date.toLocaleDateString('en-GB');
   };
 
+  // Простая функция getValue как в рабочих файлах
   const getValue = (obj, keys) => {
-    if (!obj) return "";
-    
     for (const key of keys) {
-      if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+      if (obj && obj[key] !== undefined && obj[key] !== null) {
         return obj[key];
       }
-      
-      const camelCaseKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
-      if (camelCaseKey !== key && obj.hasOwnProperty(camelCaseKey) && obj[camelCaseKey] !== undefined && obj[camelCaseKey] !== null && obj[camelCaseKey] !== "") {
-        return obj[camelCaseKey];
-      }
-      
-      const snakeCaseKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-      if (snakeCaseKey !== key && obj.hasOwnProperty(snakeCaseKey) && obj[snakeCaseKey] !== undefined && obj[snakeCaseKey] !== null && obj[snakeCaseKey] !== "") {
-        return obj[snakeCaseKey];
-      }
     }
-    
     return "";
   };
 
@@ -96,49 +84,41 @@ function ReceiptPage() {
         const activityRows = [];
         activityRows.push([`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']);
         
-        const propertyName = getValue(activity, ['propertyName', 'property_name']);
-        if (propertyName) {
-          activityRows.push(['Property', propertyName]);
+        // Используем прямое обращение к свойствам как в рабочих файлах
+        if (getValue(activity, ['propertyName', 'property_name'])) {
+          activityRows.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
         }
         
-        const propertyAddress = getValue(activity, ['propertyAddress', 'property_address']);
-        if (propertyAddress) {
-          activityRows.push(['Address', propertyAddress]);
+        if (getValue(activity, ['propertyAddress', 'property_address'])) {
+          activityRows.push(['Address', getValue(activity, ['propertyAddress', 'property_address'])]);
         }
         
-        const checkIn = getValue(activity, ['checkIn', 'check_in']);
-        if (checkIn) {
-          activityRows.push(['Check-in', formatDate(checkIn)]);
+        if (getValue(activity, ['checkIn', 'check_in'])) {
+          activityRows.push(['Check-in', formatDate(getValue(activity, ['checkIn', 'check_in']))]);
         }
         
-        const checkOut = getValue(activity, ['checkOut', 'check_out']);
-        if (checkOut) {
-          activityRows.push(['Check-out', formatDate(checkOut)]);
+        if (getValue(activity, ['checkOut', 'check_out'])) {
+          activityRows.push(['Check-out', formatDate(getValue(activity, ['checkOut', 'check_out']))]);
         }
         
-        const carModel = getValue(activity, ['carModel', 'car_model']);
-        if (carModel) {
-          activityRows.push(['Car Model', carModel]);
+        if (getValue(activity, ['carModel', 'car_model'])) {
+          activityRows.push(['Car Model', getValue(activity, ['carModel', 'car_model'])]);
         }
         
-        const carPlate = getValue(activity, ['carPlate', 'car_plate']);
-        if (carPlate) {
-          activityRows.push(['Car Plate', carPlate]);
+        if (getValue(activity, ['carPlate', 'car_plate'])) {
+          activityRows.push(['Car Plate', getValue(activity, ['carPlate', 'car_plate'])]);
         }
         
-        const pickupLocation = getValue(activity, ['pickupLocation', 'pickup_location']);
-        if (pickupLocation) {
-          activityRows.push(['Pickup', pickupLocation]);
+        if (getValue(activity, ['pickupLocation', 'pickup_location'])) {
+          activityRows.push(['Pickup', getValue(activity, ['pickupLocation', 'pickup_location'])]);
         }
         
-        const dropoffLocation = getValue(activity, ['dropoffLocation', 'dropoff_location']);
-        if (dropoffLocation) {
-          activityRows.push(['Dropoff', dropoffLocation]);
+        if (getValue(activity, ['dropoffLocation', 'dropoff_location'])) {
+          activityRows.push(['Dropoff', getValue(activity, ['dropoffLocation', 'dropoff_location'])]);
         }
         
-        const transferType = getValue(activity, ['transferType', 'transfer_type']);
-        if (transferType) {
-          activityRows.push(['Transfer Type', transferType]);
+        if (getValue(activity, ['transferType', 'transfer_type'])) {
+          activityRows.push(['Transfer Type', getValue(activity, ['transferType', 'transfer_type'])]);
         }
         
         if (activity.description) {
