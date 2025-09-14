@@ -12,11 +12,24 @@ function ReceiptPreview({ data, onClick }) {
   };
 
   const getValue = (obj, keys) => {
+    if (!obj) return "";
+    
     for (const key of keys) {
-      if (obj && obj[key] !== undefined && obj[key] !== null) {
+      if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
         return obj[key];
       }
+      
+      const camelCaseKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+      if (camelCaseKey !== key && obj.hasOwnProperty(camelCaseKey) && obj[camelCaseKey] !== undefined && obj[camelCaseKey] !== null && obj[camelCaseKey] !== "") {
+        return obj[camelCaseKey];
+      }
+      
+      const snakeCaseKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+      if (snakeCaseKey !== key && obj.hasOwnProperty(snakeCaseKey) && obj[snakeCaseKey] !== undefined && obj[snakeCaseKey] !== null && obj[snakeCaseKey] !== "") {
+        return obj[snakeCaseKey];
+      }
     }
+    
     return "";
   };
 
@@ -53,36 +66,56 @@ function ReceiptPreview({ data, onClick }) {
       data.activities.forEach((activity, index) => {
         const activityRows = [];
         activityRows.push([`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']);
-        if (getValue(activity, ['propertyName', 'property_name'])) {
-          activityRows.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
+        
+        const propertyName = getValue(activity, ['propertyName', 'property_name']);
+        if (propertyName) {
+          activityRows.push(['Property', propertyName]);
         }
-        if (getValue(activity, ['propertyAddress', 'property_address'])) {
-          activityRows.push(['Address', getValue(activity, ['propertyAddress', 'property_address'])]);
+        
+        const propertyAddress = getValue(activity, ['propertyAddress', 'property_address']);
+        if (propertyAddress) {
+          activityRows.push(['Address', propertyAddress]);
         }
-        if (getValue(activity, ['checkIn', 'check_in'])) {
-          activityRows.push(['Check-in', formatDate(getValue(activity, ['checkIn', 'check_in']))]);
+        
+        const checkIn = getValue(activity, ['checkIn', 'check_in']);
+        if (checkIn) {
+          activityRows.push(['Check-in', formatDate(checkIn)]);
         }
-        if (getValue(activity, ['checkOut', 'check_out'])) {
-          activityRows.push(['Check-out', formatDate(getValue(activity, ['checkOut', 'check_out']))]);
+        
+        const checkOut = getValue(activity, ['checkOut', 'check_out']);
+        if (checkOut) {
+          activityRows.push(['Check-out', formatDate(checkOut)]);
         }
-        if (getValue(activity, ['carModel', 'car_model'])) {
-          activityRows.push(['Car Model', getValue(activity, ['carModel', 'car_model'])]);
+        
+        const carModel = getValue(activity, ['carModel', 'car_model']);
+        if (carModel) {
+          activityRows.push(['Car Model', carModel]);
         }
-        if (getValue(activity, ['carPlate', 'car_plate'])) {
-          activityRows.push(['Car Plate', getValue(activity, ['carPlate', 'car_plate'])]);
+        
+        const carPlate = getValue(activity, ['carPlate', 'car_plate']);
+        if (carPlate) {
+          activityRows.push(['Car Plate', carPlate]);
         }
-        if (getValue(activity, ['pickupLocation', 'pickup_location'])) {
-          activityRows.push(['Pickup', getValue(activity, ['pickupLocation', 'pickup_location'])]);
+        
+        const pickupLocation = getValue(activity, ['pickupLocation', 'pickup_location']);
+        if (pickupLocation) {
+          activityRows.push(['Pickup', pickupLocation]);
         }
-        if (getValue(activity, ['dropoffLocation', 'dropoff_location'])) {
-          activityRows.push(['Dropoff', getValue(activity, ['dropoffLocation', 'dropoff_location'])]);
+        
+        const dropoffLocation = getValue(activity, ['dropoffLocation', 'dropoff_location']);
+        if (dropoffLocation) {
+          activityRows.push(['Dropoff', dropoffLocation]);
         }
-        if (getValue(activity, ['transferType', 'transfer_type'])) {
-          activityRows.push(['Transfer Type', getValue(activity, ['transferType', 'transfer_type'])]);
+        
+        const transferType = getValue(activity, ['transferType', 'transfer_type']);
+        if (transferType) {
+          activityRows.push(['Transfer Type', transferType]);
         }
+        
         if (activity.description) {
           activityRows.push(['Description', activity.description]);
         }
+        
         activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
 
         autoTable(doc, {
@@ -193,7 +226,7 @@ function ReceiptPreview({ data, onClick }) {
           {data.activities.map((activity, index) => (
             <div key={index} className="card mb-2 border-light">
               <div className="card-body p-3">
-                <h6 className="card-title mb-2 text-capitalize">{activity.type} - Activity {index + 1}</h6>
+                <h6 className="card-title mb-2 text-capitalize">{activity.type || 'Unknown'} - Activity {index + 1}</h6>
                 <div className="row">
                   {getValue(activity, ['propertyName', 'property_name']) && (
                     <div className="col-12 mb-1">
@@ -285,14 +318,32 @@ function ReceiptPreview({ data, onClick }) {
               </div>
             </div>
           ))}
+          <div className="card bg-light">
+            <div className="card-body p-3">
+              <div className="row">
+                <div className="col-6"><strong>Total Amount:</strong></div>
+                <div className="col-6"><strong>€{parseFloat(getValue(data, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}</strong></div>
+              </div>
+            </div>
+          </div>
         </>
       )}
 
-      <p className="text-muted small mb-2">
+      <hr style={{ borderTop: "1px dashed #ccc", margin: "20px 0" }} />
+      <p className="text-muted small mb-3">
         Your receipt is automatically generated. This is proof of your transaction – you can't use it to claim VAT. 
         Note: This isn't an invoice. A valid invoice for tax purposes can only be issued by the property.
       </p>
-      <button className="btn btn-success w-100" onClick={downloadPDF}>Download PDF</button>
+      <button 
+        className="btn btn-success w-100 mb-2" 
+        onClick={(e) => {
+          e.stopPropagation();
+          downloadPDF();
+        }}
+        style={{ backgroundColor: "#28a745", border: "none", borderRadius: "5px", fontWeight: "500" }}
+      >
+        Download PDF
+      </button>
       <div className="mt-3 text-center">
         <QRCodeSVG value={qrData} size={128} />
         <p className="text-muted small mt-2">Scan to download PDF</p>
