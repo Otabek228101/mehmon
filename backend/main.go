@@ -11,16 +11,17 @@ import (
 )
 
 func main() {
-	seedDB := flag.Bool("seed", false, "Seed the database with test data")
+	// seedDB := flag.Bool("seed", false, "Seed the database with test data")
 	flag.Parse()
 
 	database.Connect()
 	database.Migrate()
+	database.SeedData()
 
-	if *seedDB {
-		database.SeedData()
-		return
-	}
+	// if *seedDB {
+	// 	database.SeedData()
+	// 	return
+	// }
 
 	app := fiber.New()
 
