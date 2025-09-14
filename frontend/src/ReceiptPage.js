@@ -46,7 +46,7 @@ function ReceiptPage() {
     return "";
   };
 
-  const downloadPDF = (receiptData) => {
+  const downloadPDF = async (receiptData) => {
     if (!receiptData) return;
     const doc = new jsPDF();
     doc.addImage(logo, 'PNG', 10, 10, 50, 12);
@@ -127,27 +127,47 @@ function ReceiptPage() {
         }
         doc.text(`Amount: €${parseFloat(activity.amount || 0).toFixed(2)}`, 15, y);
         y += 10;
+        if (y > 250) {
+          doc.addPage();
+          y = 10;
+        }
       });
       doc.text(`Total Amount: €${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`, 10, y);
       y += 15;
+      if (y > 250) {
+        doc.addPage();
+        y = 10;
+      }
     }
     doc.setFontSize(10);
     doc.text("Your receipt is automatically generated. This is proof of your transaction – you can't use it to claim VAT.", 10, y, { maxWidth: 180 });
     y += 15;
+    if (y > 250) {
+      doc.addPage();
+      y = 10;
+    }
     doc.text("Note: This isn't an invoice. A valid invoice for tax purposes can only be issued by the property.", 10, y, { maxWidth: 180 });
     y += 15;
+    if (y > 250) {
+      doc.addPage();
+      y = 10;
+    }
 
     // Add QR Code
-    QRCode.toDataURL(`${window.location.origin}/receipt/${receiptData.id}?download=true`, { errorCorrectionLevel: 'H', width: 128 }, (err, url) => {
-      if (err) {
-        console.error(err);
-        doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
-        return;
-      }
+    try {
+      const url = await new Promise((resolve, reject) => {
+        QRCode.toDataURL(`${window.location.origin}/receipt/${receiptData.id}?download=true`, { errorCorrectionLevel: 'H', width: 128 }, (err, url) => {
+          if (err) reject(err);
+          resolve(url);
+        });
+      });
       doc.addImage(url, 'PNG', 10, y, 40, 40);
       doc.text("Scan to download PDF", 10, y + 45);
+    } catch (err) {
+      console.error(err);
+    } finally {
       doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
-    });
+    }
   };
 
   if (!data) {
