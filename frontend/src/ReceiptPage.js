@@ -17,7 +17,7 @@ function ReceiptPage() {
     const loadData = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/receipts/${id}`);
-        console.log("Received data:", response.data); // Добавим лог для отладки
+        console.log("Received data:", response.data); 
         setData(response.data);
         setQrData(`${window.location.origin}/receipt/${id}?download=true`);
         const urlParams = new URLSearchParams(window.location.search);
@@ -39,32 +39,34 @@ function ReceiptPage() {
     return date.toLocaleDateString('en-GB');
   };
 
-  const getValue = (obj, keys) => {
-    if (!obj) return "";
-    
-    for (const key of keys) {
-      // Попробуем найти ключ как есть
-      if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
-        return obj[key];
-      }
-      
-      // Попробуем найти ключ в camelCase
-      const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      if (camelCaseKey !== key && obj[camelCaseKey] !== undefined && obj[camelCaseKey] !== null && obj[camelCaseKey] !== "") {
-        return obj[camelCaseKey];
-      }
-      
-      // Попробуем найти ключ в snake_case
-      const snakeCaseKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-      if (snakeCaseKey !== key && obj[snakeCaseKey] !== undefined && obj[snakeCaseKey] !== null && obj[snakeCaseKey] !== "") {
-        return obj[snakeCaseKey];
-      }
+const getValue = (obj, keys) => {
+  if (!obj) return "";
+  for (const key of keys) {
+    if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+      return obj[key];
     }
-    return "";
-  };
-
+    const camelCaseKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+    if (camelCaseKey !== key && obj.hasOwnProperty(camelCaseKey) && obj[camelCaseKey] !== undefined && obj[camelCaseKey] !== null && obj[camelCaseKey] !== "") {
+      return obj[camelCaseKey];
+    }
+    const snakeCaseKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    if (snakeCaseKey !== key && obj.hasOwnProperty(snakeCaseKey) && obj[snakeCaseKey] !== undefined && obj[snakeCaseKey] !== null && obj[snakeCaseKey] !== "") {
+      return obj[snakeCaseKey];
+    }
+  }
+  console.log(`getValue: не найден ни один из ключей [${keys.join(', ')}] в объекте:`, obj);
+  return "";
+};
   const downloadPDF = async (receiptData) => {
     if (!receiptData) return;
+    console.log("Полные данные для PDF:", receiptData);
+    console.log("Имя клиента:", getValue(receiptData, ['clientName', 'client_name']));
+    console.log("Email клиента:", getValue(receiptData, ['clientEmail', 'client_email']));
+    console.log("Телефон клиента:", getValue(receiptData, ['clientPhone', 'client_phone']));
+    console.log("Дата чека:", getValue(receiptData, ['receiptDate', 'receipt_date']));
+    console.log("Номер чека:", getValue(receiptData, ['receiptNumber', 'receipt_number']));
+    console.log("Активности:", receiptData.activities);
+  
     const doc = new jsPDF();
     
     doc.addImage(logo, 'PNG', 10, 10, 50, 12);
