@@ -17,6 +17,7 @@ function ReceiptPage() {
     const loadData = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/receipts/${id}`);
+        console.log("Received data:", response.data); // Добавим лог для отладки
         setData(response.data);
         setQrData(`${window.location.origin}/receipt/${id}?download=true`);
         const urlParams = new URLSearchParams(window.location.search);
@@ -39,9 +40,24 @@ function ReceiptPage() {
   };
 
   const getValue = (obj, keys) => {
+    if (!obj) return "";
+    
     for (const key of keys) {
-      if (obj && obj[key] !== undefined && obj[key] !== null) {
+      // Попробуем найти ключ как есть
+      if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
         return obj[key];
+      }
+      
+      // Попробуем найти ключ в camelCase
+      const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      if (camelCaseKey !== key && obj[camelCaseKey] !== undefined && obj[camelCaseKey] !== null && obj[camelCaseKey] !== "") {
+        return obj[camelCaseKey];
+      }
+      
+      // Попробуем найти ключ в snake_case
+      const snakeCaseKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+      if (snakeCaseKey !== key && obj[snakeCaseKey] !== undefined && obj[snakeCaseKey] !== null && obj[snakeCaseKey] !== "") {
+        return obj[snakeCaseKey];
       }
     }
     return "";
@@ -80,36 +96,56 @@ function ReceiptPage() {
       receiptData.activities.forEach((activity, index) => {
         const activityRows = [];
         activityRows.push([`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']);
-        if (getValue(activity, ['propertyName', 'property_name'])) {
-          activityRows.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
+        
+        const propertyName = getValue(activity, ['propertyName', 'property_name']);
+        if (propertyName) {
+          activityRows.push(['Property', propertyName]);
         }
-        if (getValue(activity, ['propertyAddress', 'property_address'])) {
-          activityRows.push(['Address', getValue(activity, ['propertyAddress', 'property_address'])]);
+        
+        const propertyAddress = getValue(activity, ['propertyAddress', 'property_address']);
+        if (propertyAddress) {
+          activityRows.push(['Address', propertyAddress]);
         }
-        if (getValue(activity, ['checkIn', 'check_in'])) {
-          activityRows.push(['Check-in', formatDate(getValue(activity, ['checkIn', 'check_in']))]);
+        
+        const checkIn = getValue(activity, ['checkIn', 'check_in']);
+        if (checkIn) {
+          activityRows.push(['Check-in', formatDate(checkIn)]);
         }
-        if (getValue(activity, ['checkOut', 'check_out'])) {
-          activityRows.push(['Check-out', formatDate(getValue(activity, ['checkOut', 'check_out']))]);
+        
+        const checkOut = getValue(activity, ['checkOut', 'check_out']);
+        if (checkOut) {
+          activityRows.push(['Check-out', formatDate(checkOut)]);
         }
-        if (getValue(activity, ['carModel', 'car_model'])) {
-          activityRows.push(['Car Model', getValue(activity, ['carModel', 'car_model'])]);
+        
+        const carModel = getValue(activity, ['carModel', 'car_model']);
+        if (carModel) {
+          activityRows.push(['Car Model', carModel]);
         }
-        if (getValue(activity, ['carPlate', 'car_plate'])) {
-          activityRows.push(['Car Plate', getValue(activity, ['carPlate', 'car_plate'])]);
+        
+        const carPlate = getValue(activity, ['carPlate', 'car_plate']);
+        if (carPlate) {
+          activityRows.push(['Car Plate', carPlate]);
         }
-        if (getValue(activity, ['pickupLocation', 'pickup_location'])) {
-          activityRows.push(['Pickup', getValue(activity, ['pickupLocation', 'pickup_location'])]);
+        
+        const pickupLocation = getValue(activity, ['pickupLocation', 'pickup_location']);
+        if (pickupLocation) {
+          activityRows.push(['Pickup', pickupLocation]);
         }
-        if (getValue(activity, ['dropoffLocation', 'dropoff_location'])) {
-          activityRows.push(['Dropoff', getValue(activity, ['dropoffLocation', 'dropoff_location'])]);
+        
+        const dropoffLocation = getValue(activity, ['dropoffLocation', 'dropoff_location']);
+        if (dropoffLocation) {
+          activityRows.push(['Dropoff', dropoffLocation]);
         }
-        if (getValue(activity, ['transferType', 'transfer_type'])) {
-          activityRows.push(['Transfer Type', getValue(activity, ['transferType', 'transfer_type'])]);
+        
+        const transferType = getValue(activity, ['transferType', 'transfer_type']);
+        if (transferType) {
+          activityRows.push(['Transfer Type', transferType]);
         }
+        
         if (activity.description) {
           activityRows.push(['Description', activity.description]);
         }
+        
         activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
 
         autoTable(doc, {
