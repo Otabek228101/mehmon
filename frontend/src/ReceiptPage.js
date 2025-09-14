@@ -4,6 +4,7 @@ import { jsPDF } from "jspdf";
 import logo from "./logoBlack.png";
 import { QRCodeSVG } from 'qrcode.react';
 import axios from "axios";
+import QRCode from 'qrcode';
 
 function ReceiptPage() {
   const navigate = useNavigate();
@@ -136,26 +137,17 @@ function ReceiptPage() {
     doc.text("Note: This isn't an invoice. A valid invoice for tax purposes can only be issued by the property.", 10, y, { maxWidth: 180 });
     y += 15;
 
-    const qrCanvas = document.createElement('canvas');
-    qrCanvas.width = 128;
-    qrCanvas.height = 128;
-    const qrSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    qrSvg.setAttribute('width', '128');
-    qrSvg.setAttribute('height', '128');
-    const qrCode = new QRCodeSVG({
-      value: `${window.location.origin}/receipt/${receiptData.id}?download=true`,
-      size: 128,
-    });
-    qrSvg.innerHTML = qrCode._reactInternalFiber.child.stateNode.innerHTML;
-    const ctx = qrCanvas.getContext('2d');
-    const img = new Image();
-    img.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(qrSvg));
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, 128, 128);
-      doc.addImage(qrCanvas.toDataURL('image/png'), 'PNG', 10, y, 40, 40);
+    // Add QR Code
+    QRCode.toDataURL(`${window.location.origin}/receipt/${receiptData.id}?download=true`, { errorCorrectionLevel: 'H', width: 128 }, (err, url) => {
+      if (err) {
+        console.error(err);
+        doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
+        return;
+      }
+      doc.addImage(url, 'PNG', 10, y, 40, 40);
       doc.text("Scan to download PDF", 10, y + 45);
       doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
-    };
+    });
   };
 
   if (!data) {
