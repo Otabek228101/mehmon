@@ -53,6 +53,10 @@ function HomePage() {
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: "" });
     }
+    // Clear date-related errors when changing dates
+    if (e.target.name === "checkIn" || e.target.name === "checkOut") {
+      setErrors({ ...errors, [`activityCheckOut${index}`]: "" });
+    }
   };
 
   const handleHotelSelect = (e, index) => {
@@ -435,10 +439,11 @@ function HomePage() {
                         <input
                           type="date"
                           name="checkOut"
-                          className="form-control"
+                          className={`form-control ${errors[`activityCheckOut${index}`] ? "is-invalid" : ""}`}
                           value={activity.checkOut}
                           onChange={(e) => handleChange(e, index)}
                         />
+                        {errors[`activityCheckOut${index}`] && <div className="invalid-feedback">{errors[`activityCheckOut${index}`]}</div>}
                       </div>
                     </div>
                     <div className="mb-3">
