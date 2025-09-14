@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import jsPDF from "jspdf";
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import logo from "./logoBlack.png";
 import { QRCodeSVG } from 'qrcode.react';
 import axios from "axios";
@@ -59,7 +59,7 @@ function ReceiptPage() {
     doc.setFontSize(12);
     doc.text("This is your receipt", 10, 30);
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: 40,
       head: [['YOUR DETAILS']],
       body: [
@@ -112,7 +112,7 @@ function ReceiptPage() {
         }
         activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
 
-        doc.autoTable({
+        autoTable(doc, {
           startY: y,
           head: [[`ACTIVITY ${index + 1}`]],
           body: activityRows,
@@ -129,7 +129,7 @@ function ReceiptPage() {
         }
       });
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: y,
         body: [['Total Amount', `€${parseFloat(getValue(receiptData, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`]],
         theme: 'grid',

@@ -1,7 +1,7 @@
 import logo from "./logoBlack.png"; 
 import { QRCodeSVG } from 'qrcode.react';
 import jsPDF from "jspdf";
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import QRCode from 'qrcode';
 
 function ReceiptPreview({ data, onClick }) {
@@ -32,7 +32,7 @@ function ReceiptPreview({ data, onClick }) {
     doc.setFontSize(12);
     doc.text("This is your receipt", 10, 30);
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: 40,
       head: [['YOUR DETAILS']],
       body: [
@@ -85,7 +85,7 @@ function ReceiptPreview({ data, onClick }) {
         }
         activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
 
-        doc.autoTable({
+        autoTable(doc, {
           startY: y,
           head: [[`ACTIVITY ${index + 1}`]],
           body: activityRows,
@@ -102,7 +102,7 @@ function ReceiptPreview({ data, onClick }) {
         }
       });
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: y,
         body: [['Total Amount', `€${parseFloat(getValue(data, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}`]],
         theme: 'grid',
