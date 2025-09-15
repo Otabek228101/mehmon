@@ -37,7 +37,10 @@ function ReceiptPreview({ data, onClick }) {
     if (!data) return;
     const doc = new jsPDF();
     
-    doc.addImage(logo, 'PNG', 10, 10, 50, 12);
+    // Пропорциональное изменение размера логотипа
+    const logoWidth = 50;
+    const logoHeight = 40; // Новая высота для сохранения пропорций
+    doc.addImage(logo, 'PNG', 10, 10, logoWidth, logoHeight);
     
     doc.setFontSize(16);
     doc.text(`Booking Number ${getValue(data, ['receiptNumber', 'receipt_number'])}`, 200, 20, { align: 'right' });
@@ -108,9 +111,10 @@ function ReceiptPreview({ data, onClick }) {
         
         activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
 
+        // Изменен порядок в заголовке активности
         autoTable(doc, {
           startY: y,
-          head: [[`${activity.type || 'Unknown'} - Activity ${index + 1}`, '']],
+          head: [[`Activity ${index + 1} - ${activity.type || 'Unknown'}`, '']],
           body: activityRows,
           theme: 'grid',
           styles: { fontSize: 10, cellPadding: 2 },
@@ -228,7 +232,8 @@ function ReceiptPreview({ data, onClick }) {
           {data.activities.map((activity, index) => (
             <div key={index} className="card mb-2 border-light">
               <div className="card-body p-3">
-                <h6 className="card-title mb-2 text-capitalize">{activity.type || 'Unknown'} - Activity {index + 1}</h6>
+                {/* Изменен порядок в заголовке активности */}
+                <h6 className="card-title mb-2 text-capitalize">Activity {index + 1} - {activity.type || 'Unknown'}</h6>
                 <div className="row">
                   {getValue(activity, ['propertyName', 'property_name']) && (
                     <div className="col-12 mb-1">
@@ -354,4 +359,4 @@ function ReceiptPreview({ data, onClick }) {
   );
 }
 
-export default ReceiptPreview
+export default ReceiptPreview;
