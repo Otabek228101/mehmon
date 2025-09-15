@@ -17,7 +17,7 @@ function ReceiptPage() {
     const loadData = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/receipts/${id}`);
-        console.log("Received data:", response.data); 
+        console.log("Received data:", response.data);
         setData(response.data);
         setQrData(`${window.location.origin}/receipt/${id}?download=true`);
         const urlParams = new URLSearchParams(window.location.search);
@@ -50,20 +50,19 @@ function ReceiptPage() {
 
   const downloadPDF = async (receiptData) => {
     if (!receiptData) return;
-    
+
     const doc = new jsPDF();
-    
-    // Пропорциональное изменение размера логотипа
-    const logoWidth = 50;
-    const logoHeight = 40; // Новая высота для сохранения пропорций
+
+    const logoWidth = 30;
+    const logoHeight = 15;
     doc.addImage(logo, 'PNG', 10, 10, logoWidth, logoHeight);
-    
+
     doc.setFontSize(16);
     doc.text(`Booking Number ${getValue(receiptData, ['receiptNumber', 'receipt_number'])}`, 200, 20, { align: 'right' });
-    
+
     doc.setFontSize(12);
     doc.text("This is your receipt", 10, 30);
-    
+
     autoTable(doc, {
       startY: 40,
       head: [['YOUR DETAILS', '']],
@@ -84,47 +83,47 @@ function ReceiptPage() {
     if (receiptData.activities && receiptData.activities.length > 0) {
       receiptData.activities.forEach((activity, index) => {
         const activityRows = [];
-        
+
         if (getValue(activity, ['propertyName', 'property_name'])) {
           activityRows.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
         }
-        
+
         if (getValue(activity, ['propertyAddress', 'property_address'])) {
           activityRows.push(['Address', getValue(activity, ['propertyAddress', 'property_address'])]);
         }
-        
+
         if (getValue(activity, ['checkIn', 'check_in'])) {
           activityRows.push(['Check-in', formatDate(getValue(activity, ['checkIn', 'check_in']))]);
         }
-        
+
         if (getValue(activity, ['checkOut', 'check_out'])) {
           activityRows.push(['Check-out', formatDate(getValue(activity, ['checkOut', 'check_out']))]);
         }
-        
+
         if (getValue(activity, ['carModel', 'car_model'])) {
           activityRows.push(['Car Model', getValue(activity, ['carModel', 'car_model'])]);
         }
-        
+
         if (getValue(activity, ['carPlate', 'car_plate'])) {
           activityRows.push(['Car Plate', getValue(activity, ['carPlate', 'car_plate'])]);
         }
-        
+
         if (getValue(activity, ['pickupLocation', 'pickup_location'])) {
           activityRows.push(['Pickup', getValue(activity, ['pickupLocation', 'pickup_location'])]);
         }
-        
+
         if (getValue(activity, ['dropoffLocation', 'dropoff_location'])) {
           activityRows.push(['Dropoff', getValue(activity, ['dropoffLocation', 'dropoff_location'])]);
         }
-        
+
         if (getValue(activity, ['transferType', 'transfer_type'])) {
           activityRows.push(['Transfer Type', getValue(activity, ['transferType', 'transfer_type'])]);
         }
-        
+
         if (activity.description) {
           activityRows.push(['Description', activity.description]);
         }
-        
+
         activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
 
         // Изменен порядок в заголовке активности
@@ -202,7 +201,7 @@ function ReceiptPage() {
     doc.text("Phone: +998900091090, +393751060001", 10, y);
     y += 5;
     doc.text("Telegram: https://t.me/mehmon_contact", 10, y);
-    
+
     doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
   };
 
@@ -220,7 +219,7 @@ function ReceiptPage() {
             <h5 style={{ margin: "0" }}>Booking Number {getValue(data, ['receiptNumber', 'receipt_number'])}</h5>
           </div>
           <p className="text-muted mb-2">This is your receipt</p>
-          
+
           <h6 className="mb-2">YOUR DETAILS</h6>
           <table className="table table-borderless">
             <tbody>
@@ -230,7 +229,7 @@ function ReceiptPage() {
               <tr><td><strong>Date:</strong></td><td>{formatDate(getValue(data, ['receiptDate', 'receipt_date']))}</td></tr>
             </tbody>
           </table>
-          
+
           <h6 className="mb-2">BOOKING DETAILS</h6>
           <table className="table table-borderless">
             <tbody>
@@ -354,7 +353,7 @@ function ReceiptPage() {
 
           <hr style={{ borderTop: "1px dashed #ccc", margin: "20px 0" }} />
           <p className="text-muted small mb-3">
-            Your receipt is automatically generated. This is proof of your transaction – you can't use it to claim VAT. 
+            Your receipt is automatically generated. This is proof of your transaction – you can't use it to claim VAT.
             Note: This isn't an invoice. A valid invoice for tax purposes can only be issued by the property.
           </p>
           <button onClick={() => downloadPDF(data)} className="btn btn-success w-100 py-2" style={{ backgroundColor: "#28a745", border: "none", borderRadius: "5px", fontWeight: "500" }}>

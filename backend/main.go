@@ -8,11 +8,16 @@ import (
 	"github.com/Otabek228101/mehmon/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	// seedDB := flag.Bool("seed", false, "Seed the database with test data")
 	flag.Parse()
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	database.Connect()
 	database.Migrate()
