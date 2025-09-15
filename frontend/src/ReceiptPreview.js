@@ -48,36 +48,6 @@ function ReceiptPreview({ data, onClick }) {
 
   const downloadPDF = async () => {
     if (!data) return;
-<<<<<<< HEAD
-=======
-    const doc = new jsPDF();
-    
-    // Пропорциональное изменение размера логотипа
-    const logoWidth = 50;
-    const logoHeight = 40; // Новая высота для сохранения пропорций
-    doc.addImage(logo, 'PNG', 10, 10, logoWidth, logoHeight);
-    
-    doc.setFontSize(16);
-    doc.text(`Booking Number ${getValue(data, ['receiptNumber', 'receipt_number'])}`, 200, 20, { align: 'right' });
-    
-    doc.setFontSize(12);
-    doc.text("This is your receipt", 10, 30);
-    
-    autoTable(doc, {
-      startY: 40,
-      head: [['YOUR DETAILS', '']],
-      body: [
-        ['Name', getValue(data, ['clientName', 'client_name'])],
-        ['Email', getValue(data, ['clientEmail', 'client_email'])],
-        ['Phone', getValue(data, ['clientPhone', 'client_phone'])],
-        ['Date', formatDate(getValue(data, ['receiptDate', 'receipt_date']))],
-      ],
-      theme: 'grid',
-      styles: { fontSize: 10, cellPadding: 2 },
-      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold' },
-      margin: { left: 10, right: 10 },
-    });
->>>>>>> a3edced53b803d0f555694d23e1098330fa76021
 
     const doc = new jsPDF();
 
@@ -175,16 +145,9 @@ function ReceiptPreview({ data, onClick }) {
         }
         activityData.push(['Amount', `$${parseFloat(activity.amount || 0).toFixed(2)}`]);
 
-        // Изменен порядок в заголовке активности
         autoTable(doc, {
-<<<<<<< HEAD
           startY: currentY,
           body: activityData,
-=======
-          startY: y,
-          head: [[`Activity ${index + 1} - ${activity.type || 'Unknown'}`, '']],
-          body: activityRows,
->>>>>>> a3edced53b803d0f555694d23e1098330fa76021
           theme: 'grid',
           styles: { 
             fontSize: 9, 
@@ -257,7 +220,6 @@ function ReceiptPreview({ data, onClick }) {
         </div>
         <p className="text-muted mb-2">This is your receipt</p>
 
-<<<<<<< HEAD
         <h6 className="mb-2">YOUR DETAILS</h6>
         <table className="table table-borderless">
           <tbody>
@@ -356,18 +318,6 @@ function ReceiptPreview({ data, onClick }) {
                         </div>
                       </div>
                     )}
-=======
-      {data.activities && data.activities.length > 0 && (
-        <>
-          <h6 className="mb-2 mt-3">ACTIVITIES</h6>
-          {data.activities.map((activity, index) => (
-            <div key={index} className="card mb-2 border-light">
-              <div className="card-body p-3">
-                {/* Изменен порядок в заголовке активности */}
-                <h6 className="card-title mb-2 text-capitalize">Activity {index + 1} - {activity.type || 'Unknown'}</h6>
-                <div className="row">
-                  {getValue(activity, ['propertyName', 'property_name']) && (
->>>>>>> a3edced53b803d0f555694d23e1098330fa76021
                     <div className="col-12 mb-1">
                       <div className="row">
                         <div className="col-5"><strong>Amount:</strong></div>
@@ -413,8 +363,4 @@ function ReceiptPreview({ data, onClick }) {
   );
 }
 
-<<<<<<< HEAD
 export default ReceiptPreview;
-=======
-export default ReceiptPreview;
->>>>>>> a3edced53b803d0f555694d23e1098330fa76021
