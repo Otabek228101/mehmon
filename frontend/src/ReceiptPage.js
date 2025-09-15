@@ -49,6 +49,7 @@ function ReceiptPage() {
     return "";
   };
 
+<<<<<<< HEAD
   const formatDateForPDF = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -59,6 +60,37 @@ function ReceiptPage() {
     };
     return date.toLocaleDateString('en-US', options).toUpperCase();
   };
+=======
+  const downloadPDF = async (receiptData) => {
+    if (!receiptData) return;
+
+    const doc = new jsPDF();
+
+    const logoWidth = 30;
+    const logoHeight = 15;
+    doc.addImage(logo, 'PNG', 10, 10, logoWidth, logoHeight);
+
+    doc.setFontSize(16);
+    doc.text(`Booking Number ${getValue(receiptData, ['receiptNumber', 'receipt_number'])}`, 200, 20, { align: 'right' });
+
+    doc.setFontSize(12);
+    doc.text("This is your receipt", 10, 30);
+
+    autoTable(doc, {
+      startY: 40,
+      head: [['YOUR DETAILS', '']],
+      body: [
+        ['Name', getValue(receiptData, ['clientName', 'client_name'])],
+        ['Email', getValue(receiptData, ['clientEmail', 'client_email'])],
+        ['Phone', getValue(receiptData, ['clientPhone', 'client_phone'])],
+        ['Date', formatDate(getValue(receiptData, ['receiptDate', 'receipt_date']))],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 2 },
+      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0], fontStyle: 'bold' },
+      margin: { left: 10, right: 10 },
+    });
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
 
   const downloadPDF = async (receiptData, qrUrl) => {
     if (!receiptData) return;
@@ -106,6 +138,7 @@ function ReceiptPage() {
     let totalAmount = 0;
 
     if (receiptData.activities && receiptData.activities.length > 0) {
+<<<<<<< HEAD
       receiptData.activities.forEach((activity) => {
         totalAmount += parseFloat(activity.amount || 0);
 
@@ -126,41 +159,94 @@ function ReceiptPage() {
 
         const activityData = [];
         
+=======
+      receiptData.activities.forEach((activity, index) => {
+        const activityRows = [];
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['propertyName', 'property_name'])) {
           activityData.push(['Property', getValue(activity, ['propertyName', 'property_name'])]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['propertyAddress', 'property_address'])) {
           activityData.push(['Address', getValue(activity, ['propertyAddress', 'property_address'])]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['checkIn', 'check_in'])) {
           activityData.push(['Check-in', formatDate(getValue(activity, ['checkIn', 'check_in']))]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['checkOut', 'check_out'])) {
           activityData.push(['Check-out', formatDate(getValue(activity, ['checkOut', 'check_out']))]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['carModel', 'car_model'])) {
           activityData.push(['Car Model', getValue(activity, ['carModel', 'car_model'])]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['carPlate', 'car_plate'])) {
           activityData.push(['Car Plate', getValue(activity, ['carPlate', 'car_plate'])]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['pickupLocation', 'pickup_location'])) {
           activityData.push(['Pickup', getValue(activity, ['pickupLocation', 'pickup_location'])]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['dropoffLocation', 'dropoff_location'])) {
           activityData.push(['Dropoff', getValue(activity, ['dropoffLocation', 'dropoff_location'])]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (getValue(activity, ['transferType', 'transfer_type'])) {
           activityData.push(['Transfer Type', getValue(activity, ['transferType', 'transfer_type'])]);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
         if (activity.description) {
           activityData.push(['Description', activity.description]);
         }
+<<<<<<< HEAD
         activityData.push(['Amount', `$${parseFloat(activity.amount || 0).toFixed(2)}`]);
+=======
 
+        activityRows.push(['Amount', `€${parseFloat(activity.amount || 0).toFixed(2)}`]);
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
+
+        // Изменен порядок в заголовке активности
         autoTable(doc, {
+<<<<<<< HEAD
           startY: currentY,
           body: activityData,
+=======
+          startY: y,
+          head: [[`Activity ${index + 1} - ${activity.type || 'Unknown'}`, '']],
+          body: activityRows,
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
           theme: 'grid',
           styles: { 
             fontSize: 9, 
@@ -221,6 +307,17 @@ function ReceiptPage() {
     doc.addImage(qrImage, 'PNG', qrX, currentY - 40, qrSize, qrSize);
     doc.text('Scan to download PDF', qrX, currentY + 5);
 
+<<<<<<< HEAD
+=======
+    // Add contact info
+    doc.setFontSize(10);
+    doc.text("Contact Us:", 10, y);
+    y += 5;
+    doc.text("Phone: +998900091090, +393751060001", 10, y);
+    y += 5;
+    doc.text("Telegram: https://t.me/mehmon_contact", 10, y);
+
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
     doc.save(`receipt_${getValue(receiptData, ['receiptNumber', 'receipt_number'])}.pdf`);
   };
 
@@ -248,6 +345,20 @@ function ReceiptPage() {
               <tr><td><strong>Date:</strong></td><td>{formatDate(getValue(data, ['receiptDate', 'receipt_date']))}</td></tr>
             </tbody>
           </table>
+<<<<<<< HEAD
+=======
+
+          <h6 className="mb-2">BOOKING DETAILS</h6>
+          <table className="table table-borderless">
+            <tbody>
+              <tr><td><strong>Property name:</strong></td><td>{getValue(data, ['propertyName', 'property_name']) || "Multiple Properties"}</td></tr>
+              <tr><td><strong>Property address:</strong></td><td>{getValue(data, ['propertyAddress', 'property_address']) || "Various Locations"}</td></tr>
+              <tr><td><strong>Check-in:</strong></td><td>{formatDate(getValue(data, ['checkIn', 'check_in']))}</td></tr>
+              <tr><td><strong>Check-out:</strong></td><td>{formatDate(getValue(data, ['checkOut', 'check_out']))}</td></tr>
+              <tr><td><strong>Amount paid:</strong></td><td>€{parseFloat(getValue(data, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}</td></tr>
+            </tbody>
+          </table>
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
 
           {data?.activities?.length > 0 && (
             <>
@@ -255,6 +366,10 @@ function ReceiptPage() {
               {data.activities.map((activity, index) => (
                 <div key={index} className="card mb-2 border-light">
                   <div className="card-body p-3">
+<<<<<<< HEAD
+=======
+                    {/* Изменен порядок в заголовке активности */}
+>>>>>>> a3edced53b803d0f555694d23e1098330fa76021
                     <h6 className="card-title mb-2 text-capitalize">Activity {index + 1} - {activity.type || 'Unknown'}</h6>
                     <div className="row">
                       {getValue(activity, ['propertyName', 'property_name']) && (
