@@ -142,7 +142,7 @@ function ReceiptHistoryPage() {
                       <td>{getValue(receipt, ['clientEmail', 'client_email'])}</td>
                       <td>{getValue(receipt, ['clientPhone', 'client_phone'])}</td>
                       <td>{formatDate(getValue(receipt, ['receiptDate', 'receipt_date']))}</td>
-                      <td>€{parseFloat(getValue(receipt, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}</td>
+                      <td>${parseFloat(getValue(receipt, ['amountPaid', 'amount_paid']) || 0).toFixed(2)}</td>
                       <td>
                         <span className="badge bg-secondary">
                           {receipt.activities ? receipt.activities.length : 0} activities

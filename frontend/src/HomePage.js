@@ -147,17 +147,12 @@ function HomePage() {
         return sum + amount;
       }, 0);
       
-      const firstActivity = form.activities[0];
       const receiptData = {
         receiptNumber: "",
         clientName: form.clientName,
         clientEmail: form.clientEmail,
         clientPhone: form.clientPhone,
         receiptDate: new Date(form.receiptDate).toISOString(),
-        propertyName: firstActivity.propertyName || "Multiple Properties",
-        propertyAddress: firstActivity.propertyAddress || "Various Locations",
-        checkIn: firstActivity.checkIn ? new Date(firstActivity.checkIn).toISOString() : null,
-        checkOut: firstActivity.checkOut ? new Date(firstActivity.checkOut).toISOString() : null,
         activities: form.activities.map(activity => ({
           type: activity.type,
           propertyName: activity.propertyName,
@@ -199,7 +194,6 @@ function HomePage() {
       </div>
       
       <div className="row">
-        {/* Форма всегда занимает всю ширину, если нет сгенерированного чека, и половину - если есть */}
         <div className={generated ? "col-lg-6" : "col-12"}>
           <div className="card shadow">
             <div className="card-body">
@@ -447,7 +441,7 @@ function HomePage() {
                       </div>
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Amount (€)</label>
+                      <label className="form-label">Amount ($)</label>
                       <input
                         type="number"
                         name="amount"
@@ -490,7 +484,6 @@ function HomePage() {
           </div>
         </div>
         
-        {/* Предпросмотр чека - отображается только после генерации */}
         {generated && (
           <div className="col-lg-6">
             <ReceiptPreview data={generated} onClick={() => navigate(`/receipt/${generated.id}`)} />
