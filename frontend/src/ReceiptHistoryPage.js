@@ -69,7 +69,13 @@ function ReceiptHistoryPage() {
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Receipt History</h2>
-        <button 
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/admin")}
+        >
+          add New Hotel and Cat
+        </button>
+        <button
           className="btn btn-primary"
           onClick={() => navigate("/")}
         >
@@ -89,8 +95,8 @@ function ReceiptHistoryPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button 
-                  className="btn btn-outline-secondary" 
+                <button
+                  className="btn btn-outline-secondary"
                   type="button"
                   onClick={searchReceipts}
                 >
