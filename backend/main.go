@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 
 	"github.com/Otabek228101/mehmon/database"
@@ -12,8 +11,6 @@ import (
 )
 
 func main() {
-	// seedDB := flag.Bool("seed", false, "Seed the database with test data")
-	flag.Parse()
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -21,11 +18,6 @@ func main() {
 	database.Connect()
 	database.Migrate()
 	database.SeedData()
-
-	// if *seedDB {
-	// 	database.SeedData()
-	// 	return
-	// }
 
 	app := fiber.New()
 
@@ -55,4 +47,6 @@ func setupRoutes(app *fiber.App) {
 	api.Get("/car-rentals", handlers.GetCarRentals)
 	api.Post("/hotels", handlers.CreateHotel)
 	api.Post("/car-rentals", handlers.CreateCarRental)
+	api.Delete("/hotels/:id", handlers.DeleteHotel)
+	api.Delete("/car-rentals/:id", handlers.DeleteCarRental)
 }

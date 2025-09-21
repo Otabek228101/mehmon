@@ -11,17 +11,12 @@ import (
 )
 
 type ReceiptRequest struct {
-	ReceiptNumber   string            `json:"receiptNumber"`
-	ClientName      string            `json:"clientName"`
-	ClientEmail     string            `json:"clientEmail"`
-	ClientPhone     string            `json:"clientPhone"`
-	ReceiptDate     string            `json:"receiptDate"`
-	PropertyName    string            `json:"propertyName"`
-	PropertyAddress string            `json:"propertyAddress"`
-	CheckIn         *string           `json:"checkIn"`
-	CheckOut        *string           `json:"checkOut"`
-	AmountPaid      float64           `json:"amountPaid"`
-	Activities      []ActivityRequest `json:"activities"`
+	ClientName  string            `json:"clientName"`
+	ClientEmail string            `json:"clientEmail"`
+	ClientPhone string            `json:"clientPhone"`
+	ReceiptDate string            `json:"receiptDate"`
+	AmountPaid  float64           `json:"amountPaid"`
+	Activities  []ActivityRequest `json:"activities"`
 }
 
 type ActivityRequest struct {
@@ -31,8 +26,6 @@ type ActivityRequest struct {
 	CheckIn         *string `json:"checkIn"`
 	CheckOut        *string `json:"checkOut"`
 	Amount          float64 `json:"amount"`
-	CarModel        string  `json:"carModel"`
-	CarPlate        string  `json:"carPlate"`
 	PickupLocation  string  `json:"pickupLocation"`
 	DropoffLocation string  `json:"dropoffLocation"`
 	TransferType    string  `json:"transferType"`
@@ -76,8 +69,6 @@ func CreateReceipt(c *fiber.Ctx) error {
 
 	log.Printf("Received request: %+v", request)
 
-	request.ReceiptNumber = services.GenerateReceiptNumber()
-
 	receiptDate, err := time.Parse(time.RFC3339Nano, request.ReceiptDate)
 	if err != nil {
 		receiptDate, err = time.Parse("2006-01-02", request.ReceiptDate)
@@ -91,16 +82,12 @@ func CreateReceipt(c *fiber.Ctx) error {
 	}
 
 	receipt := models.Receipt{
-		ReceiptNumber:   request.ReceiptNumber,
-		ClientName:      request.ClientName,
-		ClientEmail:     request.ClientEmail,
-		ClientPhone:     request.ClientPhone,
-		ReceiptDate:     receiptDate,
-		PropertyName:    request.PropertyName,
-		PropertyAddress: request.PropertyAddress,
-		CheckIn:         parseTimeString(request.CheckIn),
-		CheckOut:        parseTimeString(request.CheckOut),
-		AmountPaid:      request.AmountPaid,
+		ReceiptNumber: services.GenerateReceiptNumber(),
+		ClientName:    request.ClientName,
+		ClientEmail:   request.ClientEmail,
+		ClientPhone:   request.ClientPhone,
+		ReceiptDate:   receiptDate,
+		AmountPaid:    request.AmountPaid,
 	}
 
 	log.Printf("Receipt before save: %+v", receipt)
@@ -125,8 +112,6 @@ func CreateReceipt(c *fiber.Ctx) error {
 			CheckIn:         parseTimeString(actReq.CheckIn),
 			CheckOut:        parseTimeString(actReq.CheckOut),
 			Amount:          actReq.Amount,
-			CarModel:        actReq.CarModel,
-			CarPlate:        actReq.CarPlate,
 			PickupLocation:  actReq.PickupLocation,
 			DropoffLocation: actReq.DropoffLocation,
 			TransferType:    actReq.TransferType,
@@ -228,10 +213,6 @@ func UpdateReceipt(c *fiber.Ctx) error {
 	receipt.ClientEmail = request.ClientEmail
 	receipt.ClientPhone = request.ClientPhone
 	receipt.ReceiptDate = receiptDate
-	receipt.PropertyName = request.PropertyName
-	receipt.PropertyAddress = request.PropertyAddress
-	receipt.CheckIn = parseTimeString(request.CheckIn)
-	receipt.CheckOut = parseTimeString(request.CheckOut)
 	receipt.AmountPaid = request.AmountPaid
 
 	database.DB.Where("receipt_id = ?", receipt.ID).Delete(&models.Activity{})
@@ -245,8 +226,6 @@ func UpdateReceipt(c *fiber.Ctx) error {
 			CheckIn:         parseTimeString(actReq.CheckIn),
 			CheckOut:        parseTimeString(actReq.CheckOut),
 			Amount:          actReq.Amount,
-			CarModel:        actReq.CarModel,
-			CarPlate:        actReq.CarPlate,
 			PickupLocation:  actReq.PickupLocation,
 			DropoffLocation: actReq.DropoffLocation,
 			TransferType:    actReq.TransferType,

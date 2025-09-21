@@ -68,11 +68,11 @@ func SeedData() {
 
 	if rentalCount == 0 {
 		carRentals := []models.CarRental{
-			{Name: "Uzbekistan Airways Car Rental", Address: "Tashkent Airport"},
-			{Name: "Avis Uzbekistan", Address: "Downtown Tashkent"},
-			{Name: "Local Car Rent", Address: "City Center"},
-			{Name: "UzAuto Rent", Address: "Chilanzar District"},
-			{Name: "Express Car Rental", Address: "Yunusobod District"},
+			{Name: "Uzbekistan Airways Car Rental"},
+			{Name: "Avis Uzbekistan"},
+			{Name: "Local Car Rent"},
+			{Name: "UzAuto Rent"},
+			{Name: "Express Car Rental"},
 		}
 
 		for _, rental := range carRentals {
@@ -90,28 +90,20 @@ func SeedData() {
 
 		receipts := []models.Receipt{
 			{
-				ReceiptNumber:   "M00001",
-				ClientName:      "John Smith",
-				ClientEmail:     "john.smith@example.com",
-				ClientPhone:     "+1234567890",
-				ReceiptDate:     now,
-				PropertyName:    "Hilton Tashkent City",
-				PropertyAddress: "Amir Temur Square 107/B",
-				CheckIn:         &now,
-				CheckOut:        &tomorrow,
-				AmountPaid:      250.0,
+				ReceiptNumber: "M00001",
+				ClientName:    "John Smith",
+				ClientEmail:   "john.smith@example.com",
+				ClientPhone:   "+1234567890",
+				ReceiptDate:   now,
+				AmountPaid:    250.0,
 			},
 			{
-				ReceiptNumber:   "M00002",
-				ClientName:      "Alice Johnson",
-				ClientEmail:     "alice.j@example.com",
-				ClientPhone:     "+0987654321",
-				ReceiptDate:     yesterday,
-				PropertyName:    "Hyatt Regency Tashkent",
-				PropertyAddress: "Navoi Street 1A",
-				CheckIn:         &yesterday,
-				CheckOut:        &tomorrow,
-				AmountPaid:      300.0,
+				ReceiptNumber: "M00002",
+				ClientName:    "Alice Johnson",
+				ClientEmail:   "alice.j@example.com",
+				ClientPhone:   "+0987654321",
+				ReceiptDate:   yesterday,
+				AmountPaid:    300.0,
 			},
 		}
 
@@ -154,8 +146,6 @@ func SeedData() {
 						CheckIn:         &now,
 						CheckOut:        &tomorrow,
 						Amount:          100.0,
-						CarModel:        "Toyota Camry",
-						CarPlate:        "01A123AA",
 					},
 				}
 			}

@@ -9,21 +9,17 @@ import (
 )
 
 func GenerateReceiptNumber() string {
-	var maxNumber string
-	database.DB.Model(&models.Receipt{}).
-		Where("receipt_number LIKE 'M%'").
-		Select("receipt_number").
-		Order("receipt_number DESC").
-		First(&maxNumber)
+	var lastReceipt models.Receipt
+	result := database.DB.Order("created_at desc").First(&lastReceipt)
 
-	nextNum := 1
-	if maxNumber != "" {
-		numStr := maxNumber[1:]
+	nextNumber := 1
+	if result.Error == nil && lastReceipt.ReceiptNumber != "" {
+		numStr := lastReceipt.ReceiptNumber[1:]
 		num, err := strconv.Atoi(numStr)
 		if err == nil {
-			nextNum = num + 1
+			nextNumber = num + 1
 		}
 	}
 
-	return "M" + fmt.Sprintf("%05d", nextNum)
+	return fmt.Sprintf("M%05d", nextNumber)
 }
