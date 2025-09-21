@@ -43,13 +43,10 @@ func CreateCarRental(c *fiber.Ctx) error {
 	var carRental models.CarRental
 	if err := c.BodyParser(&carRental); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request data"})
-<<<<<<< HEAD
-=======
 	}
 
-	if carRental.Name == "" || carRental.Address == "" {
+	if carRental.Name == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "Name and Address are required"})
->>>>>>> fee31353a8679e5cc77c143b184aed77ca27830c
 	}
 
 	if err := database.DB.Create(&carRental).Error; err != nil {
