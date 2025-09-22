@@ -11,7 +11,13 @@ const downloadPDF = async (receiptData, qrUrl) => {
   let currentY = 20;
   
   const logoWidth = 60; 
-  const logoHeight = 15; 
+  const img = new Image();
+  img.src = logo;
+  await new Promise((resolve) => {
+    img.onload = resolve;
+  });
+  const aspectRatio = img.naturalWidth / img.naturalHeight;
+  const logoHeight = logoWidth / aspectRatio;
   doc.addImage(logo, 'PNG', 75, currentY, logoWidth, logoHeight); 
   currentY += 25;
 
@@ -77,14 +83,12 @@ const downloadPDF = async (receiptData, qrUrl) => {
 
       if (activity.type !== 'car_rental' && 
           (getValue(activity, ['checkIn', 'check_in']) || getValue(activity, ['checkOut', 'check_out']))) {
-        const datesText = [];
         if (getValue(activity, ['checkIn', 'check_in'])) {
-          datesText.push(`Check-In: ${formatDateForPDF(getValue(activity, ['checkIn', 'check_in']))}`);
+          tableBody.push(['Check-In', formatDateForPDF(getValue(activity, ['checkIn', 'check_in']))]);
         }
         if (getValue(activity, ['checkOut', 'check_out'])) {
-          datesText.push(`Check-Out: ${formatDateForPDF(getValue(activity, ['checkOut', 'check_out']))}`);
+          tableBody.push(['Check-Out', formatDateForPDF(getValue(activity, ['checkOut', 'check_out']))]);
         }
-        tableBody.push(['Dates', datesText.join(' | ')]);
       }
 
       if (activity.type === 'car_rental') {

@@ -38,13 +38,71 @@ type Activity struct {
 }
 
 type Hotel struct {
-	ID      uint   `json:"id" gorm:"primaryKey"`
-	Name    string `json:"name" gorm:"column:name"`
-	Address string `json:"address" gorm:"column:address"`
-	City    string `json:"city" gorm:"column:city"`
+	ID            uint    `json:"id" gorm:"primaryKey"`
+	Name          string  `json:"name" gorm:"column:name;not null"`
+	City          string  `json:"city" gorm:"column:city;not null"`
+	GroupName     string  `json:"group_name" gorm:"column:group_name"`
+	Type          string  `json:"type" gorm:"column:type"`
+	Stars         int     `json:"stars" gorm:"column:stars"`
+	Address       string  `json:"address" gorm:"column:address;not null"`
+	LocationLink  string  `json:"location_link" gorm:"column:location_link"`
+	WebsiteLink   string  `json:"website_link" gorm:"column:website_link"`
+	Breakfast     bool    `json:"breakfast" gorm:"column:breakfast;default:false"`
+	Price         float64 `json:"price" gorm:"column:price"`
+	MaxGuests     int     `json:"max_guests" gorm:"column:max_guests;default:2"`
+	CurrentGuests int     `json:"current_guests" gorm:"column:current_guests;default:0"`
 }
 
 type CarRental struct {
 	ID   uint   `json:"id" gorm:"primaryKey"`
 	Name string `json:"name" gorm:"column:name"`
+}
+
+type Proposal struct {
+	ID             uint      `json:"id" gorm:"primaryKey"`
+	ProposalNumber string    `json:"proposalNumber" gorm:"column:proposal_number"`
+	ClientName     string    `json:"clientName" gorm:"column:client_name"`
+	Guests         int       `json:"guests" gorm:"column:guests"`
+	Level          string    `json:"level" gorm:"column:level"`
+	CheckIn        time.Time `json:"checkIn" gorm:"column:check_in"`
+	CheckOut       time.Time `json:"checkOut" gorm:"column:check_out"`
+	Breakfast      bool      `json:"breakfast" gorm:"column:breakfast"`
+	FreeCancel     bool      `json:"freeCancel" gorm:"column:free_cancel"`
+	Price          float64   `json:"price" gorm:"column:price"`
+	Location       string    `json:"location" gorm:"column:location"`
+	Website        string    `json:"website" gorm:"column:website"`
+	HotelID        uint      `json:"hotelId" gorm:"column:hotel_id"`
+	CreatedAt      time.Time `json:"createdAt"`
+	UpdatedAt      time.Time `json:"updatedAt"`
+
+	Hotel *Hotel `json:"hotel" gorm:"foreignKey:HotelID"`
+}
+
+type CreateHotelRequest struct {
+	Name          string  `json:"name"`
+	City          string  `json:"city"`
+	GroupName     string  `json:"group_name"`
+	Type          string  `json:"type"`
+	Stars         int     `json:"stars"`
+	Address       string  `json:"address"`
+	LocationLink  string  `json:"location_link"`
+	WebsiteLink   string  `json:"website_link"`
+	Breakfast     bool    `json:"breakfast"`
+	Price         float64 `json:"price"`
+	MaxGuests     int     `json:"max_guests"`
+	CurrentGuests int     `json:"current_guests"`
+}
+
+type HotelRequest struct {
+	ClientName string  `json:"clientName"`
+	Guests     int     `json:"guests"`
+	Level      string  `json:"level"`
+	CheckIn    string  `json:"checkIn"`
+	CheckOut   string  `json:"checkOut"`
+	Breakfast  bool    `json:"breakfast"`
+	FreeCancel bool    `json:"freeCancel"`
+	Price      float64 `json:"price"`
+	Location   string  `json:"location"`
+	Website    string  `json:"website"`
+	HotelID    uint    `json:"hotelId"`
 }

@@ -44,9 +44,18 @@ func setupRoutes(app *fiber.App) {
 	api.Delete("/receipts/:id", handlers.DeleteReceipt)
 
 	api.Get("/hotels", handlers.GetHotels)
-	api.Get("/car-rentals", handlers.GetCarRentals)
+	api.Get("/hotels/:id", handlers.GetHotelByID)
 	api.Post("/hotels", handlers.CreateHotel)
-	api.Post("/car-rentals", handlers.CreateCarRental)
+	api.Put("/hotels/:id", handlers.UpdateHotel)
 	api.Delete("/hotels/:id", handlers.DeleteHotel)
+
+	api.Post("/proposals", handlers.CreateProposal)
+	api.Get("/proposals", handlers.GetProposals)
+	api.Get("/proposals/:id", handlers.GetProposal)
+	api.Put("/proposals/:id", handlers.UpdateProposal)
+	api.Delete("/proposals/:id", handlers.DeleteProposal)
+
+	api.Get("/car-rentals", handlers.GetCarRentals)
+	api.Post("/car-rentals", handlers.CreateCarRental)
 	api.Delete("/car-rentals/:id", handlers.DeleteCarRental)
 }

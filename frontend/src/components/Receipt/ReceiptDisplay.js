@@ -53,17 +53,20 @@ function ReceiptDisplay({ data, formatDate, isPreview = false }) {
                 )}
                 
                 {(getValue(activity, ['checkIn', 'check_in']) || getValue(activity, ['checkOut', 'check_out'])) && (
-                  <div className="mb-2">
-                    <small className="text-muted">Dates:</small>
-                    <div>
-                      {getValue(activity, ['checkIn', 'check_in']) && (
-                        <span>Check-In: {formatDate(getValue(activity, ['checkIn', 'check_in']))}</span>
-                      )}
-                      {getValue(activity, ['checkOut', 'check_out']) && (
-                        <span>{' '}Check-Out: {formatDate(getValue(activity, ['checkOut', 'check_out']))}</span>
-                      )}
-                    </div>
-                  </div>
+                  <>
+                    {getValue(activity, ['checkIn', 'check_in']) && (
+                      <div className="mb-2">
+                        <small className="text-muted">Check-In:</small>
+                        <div>{formatDate(getValue(activity, ['checkIn', 'check_in']))}</div>
+                      </div>
+                    )}
+                    {getValue(activity, ['checkOut', 'check_out']) && (
+                      <div className="mb-2">
+                        <small className="text-muted">Check-Out:</small>
+                        <div>{formatDate(getValue(activity, ['checkOut', 'check_out']))}</div>
+                      </div>
+                    )}
+                  </>
                 )}
                 
                 {activity.type === 'car_rental' && activity.description && (
