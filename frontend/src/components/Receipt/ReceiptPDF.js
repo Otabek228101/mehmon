@@ -146,32 +146,41 @@ const downloadPDF = async (receiptData, qrUrl) => {
     });
   }
 
-  if (currentY > 100) {
-    doc.addPage();
-    currentY = 20;
-  }
-
   doc.setFontSize(16);
   doc.setFont(undefined, 'bold');
   doc.text('Total Amount', 20, currentY);
   doc.text(`$${totalAmount.toFixed(2)}`, 170, currentY, { align: 'right' });
   currentY += 15;
 
-  const qrSize = 50;
-  const qrX = 150;
-  const qrY = 250;
+  doc.setLineWidth(0.5);
+  doc.line(20, currentY, 190, currentY);
+  currentY += 10;
+
+  if (currentY > 180) {
+    doc.addPage();
+    currentY = 20;
+  }
+
+  const qrSize = 60;
+  const qrX = (doc.internal.pageSize.width - qrSize) / 2;
   
   try {
     const qrCodeDataUrl = await QRCode.toDataURL(qrUrl, { 
       width: qrSize, 
-      margin: 0,
-      errorCorrectionLevel: 'M'
+      margin: 2,
+      errorCorrectionLevel: 'H'
     });
-    doc.addImage(qrCodeDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+    
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text('Scan QR Code for Digital Copy', qrX, currentY, { align: 'center' });
+    currentY += 8;
+    
+    doc.addImage(qrCodeDataUrl, 'PNG', qrX, currentY, qrSize, qrSize);
     
     doc.setFontSize(8);
     doc.setFont(undefined, 'normal');
-    doc.text('Scan to download', qrX, qrY + qrSize + 5);
+    doc.text('Scan with your phone camera to download', qrX + qrSize/2, currentY + qrSize + 5, { align: 'center' });
   } catch (qrError) {
     console.error('QR Code generation failed:', qrError);
     doc.setFontSize(8);
