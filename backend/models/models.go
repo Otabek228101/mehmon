@@ -63,14 +63,9 @@ type Proposal struct {
 	ProposalNumber string    `json:"proposalNumber" gorm:"column:proposal_number"`
 	ClientName     string    `json:"clientName" gorm:"column:client_name"`
 	Guests         int       `json:"guests" gorm:"column:guests"`
-	Level          string    `json:"level" gorm:"column:level"`
 	CheckIn        time.Time `json:"checkIn" gorm:"column:check_in"`
 	CheckOut       time.Time `json:"checkOut" gorm:"column:check_out"`
-	Breakfast      bool      `json:"breakfast" gorm:"column:breakfast"`
-	FreeCancel     bool      `json:"freeCancel" gorm:"column:free_cancel"`
 	Price          float64   `json:"price" gorm:"column:price"`
-	Location       string    `json:"location" gorm:"column:location"`
-	Website        string    `json:"website" gorm:"column:website"`
 	HotelID        uint      `json:"hotelId" gorm:"column:hotel_id"`
 	CreatedAt      time.Time `json:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt"`
@@ -93,16 +88,11 @@ type CreateHotelRequest struct {
 	CurrentGuests int     `json:"current_guests"`
 }
 
-type HotelRequest struct {
+type ProposalRequest struct {
 	ClientName string  `json:"clientName"`
 	Guests     int     `json:"guests"`
-	Level      string  `json:"level"`
 	CheckIn    string  `json:"checkIn"`
 	CheckOut   string  `json:"checkOut"`
-	Breakfast  bool    `json:"breakfast"`
-	FreeCancel bool    `json:"freeCancel"`
 	Price      float64 `json:"price"`
-	Location   string  `json:"location"`
-	Website    string  `json:"website"`
 	HotelID    uint    `json:"hotelId"`
 }

@@ -12,13 +12,14 @@ import (
 )
 
 func CreateProposal(c *fiber.Ctx) error {
-	var request models.HotelRequest
+	var request models.ProposalRequest
 
 	if err := c.BodyParser(&request); err != nil {
 		log.Printf("Error parsing proposal request: %v", err)
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request data"})
 	}
 
+	// Парсим даты
 	checkIn, err := time.Parse("2006-01-02", request.CheckIn)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid check-in date format (YYYY-MM-DD)"})
@@ -33,27 +34,25 @@ func CreateProposal(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Check-out date must be after check-in date"})
 	}
 
+	// Проверяем существование отеля
 	var hotel models.Hotel
 	if err := database.DB.First(&hotel, request.HotelID).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Hotel not found"})
 	}
 
+	// Проверяем доступность мест
 	if request.Guests > hotel.MaxGuests-hotel.CurrentGuests {
 		return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("Not enough places. Hotel has %d available spots", hotel.MaxGuests-hotel.CurrentGuests)})
 	}
 
+	// Создаем предложение
 	proposal := models.Proposal{
 		ProposalNumber: services.GenerateProposalNumber(),
 		ClientName:     request.ClientName,
 		Guests:         request.Guests,
-		Level:          request.Level,
 		CheckIn:        checkIn,
 		CheckOut:       checkOut,
-		Breakfast:      request.Breakfast,
-		FreeCancel:     request.FreeCancel,
 		Price:          request.Price,
-		Location:       request.Location,
-		Website:        request.Website,
 		HotelID:        request.HotelID,
 	}
 
@@ -61,6 +60,7 @@ func CreateProposal(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create proposal"})
 	}
 
+	// Загружаем связанный отель
 	database.DB.Preload("Hotel").First(&proposal, proposal.ID)
 	return c.Status(201).JSON(proposal)
 }
@@ -92,7 +92,7 @@ func UpdateProposal(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "Proposal not found"})
 	}
 
-	var request models.HotelRequest
+	var request models.ProposalRequest
 	if err := c.BodyParser(&request); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request data"})
 	}
@@ -120,16 +120,12 @@ func UpdateProposal(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("Not enough places. Hotel has %d available spots", hotel.MaxGuests-hotel.CurrentGuests)})
 	}
 
+	// Обновляем предложение
 	proposal.ClientName = request.ClientName
 	proposal.Guests = request.Guests
-	proposal.Level = request.Level
 	proposal.CheckIn = checkIn
 	proposal.CheckOut = checkOut
-	proposal.Breakfast = request.Breakfast
-	proposal.FreeCancel = request.FreeCancel
 	proposal.Price = request.Price
-	proposal.Location = request.Location
-	proposal.Website = request.Website
 	proposal.HotelID = request.HotelID
 
 	if err := database.DB.Save(&proposal).Error; err != nil {
