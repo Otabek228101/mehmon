@@ -52,16 +52,16 @@ func SeedData() {
 
 	if hotelCount == 0 {
 		hotels := []models.Hotel{
-			{Name: "Violino d'Oro", City: "Venezia", Address: "P.za San Marco, 2091, 30124 Venezia VE", Stars: 5, Breakfast: true, Price: 134, MaxGuests: 200, CurrentGuests: 0},
-			{Name: "UNA Hotels Regina Bari", City: "BARI", GroupName: "UNA Hotels", Address: "SP57 Torre a Mare / Noicattaro, Noicattaro (BA)", Stars: 4, Breakfast: true, Price: 120, MaxGuests: 150, CurrentGuests: 0},
-			{Name: "UNA Hotels Bologna Centro", City: "BOLOGNA", GroupName: "UNA Hotels", Address: "Viale Pietro Pietramellara, 41, Bologna", Stars: 4, Breakfast: true, Price: 110, MaxGuests: 180, CurrentGuests: 0},
-			{Name: "L'HERMITAGE", City: "LA BAULE", GroupName: "Barriere Group", Address: "5 Espl. Lucien Barrière, 44500 La Baule-Escoublac, France", Stars: 5, Breakfast: true, Price: 350, MaxGuests: 250, CurrentGuests: 0},
-			{Name: "Principi di Piemonte | UNA Esperienze", City: "TORINO", GroupName: "UNA Hotels", Address: "Via Piero Gobetti, 15, 10123 Torino TO", Stars: 5, Breakfast: true, Price: 280, MaxGuests: 200, CurrentGuests: 0},
-			{Name: "Le Majestic", City: "CANNES", GroupName: "Barriere Group", Address: "10 Bd de la Croisette, Cannes", Stars: 5, Breakfast: true, Price: 450, MaxGuests: 300, CurrentGuests: 0},
-			{Name: "Le Gray D'Albion", City: "CANNES", GroupName: "Barriere Group", Address: "38 Rue des Serbes, Cannes", Stars: 4, Breakfast: true, Price: 320, MaxGuests: 180, CurrentGuests: 0},
-			{Name: "Grand Hotel Minerva", City: "FLORENCE", GroupName: "Collezione EM", Address: "P.za di Santa Maria Novella, 16, 50123 Firenze FI", Stars: 4, Breakfast: true, Price: 220, MaxGuests: 150, CurrentGuests: 0},
-			{Name: "Brunelleschi Firenze", City: "FLORENCE", GroupName: "Collezione EM", Address: "Piazza Sant'Elisabetta, 3, 50122 Firenze FI", Stars: 4, Breakfast: true, Price: 250, MaxGuests: 130, CurrentGuests: 0},
-			{Name: "Pensione America", City: "FORTE DEI MARMI", GroupName: "Collezione EM", Address: "Via Colombo, 24, 55042 Forte dei Marmi LU, Italy", Stars: 5, Breakfast: true, Price: 380, MaxGuests: 100, CurrentGuests: 0},
+			{Name: "Violino d'Oro", City: "Venezia", Type: "Luxury", Address: "P.za San Marco, 2091, 30124 Venezia VE", Stars: 5, Breakfast: true},
+			{Name: "UNA Hotels Regina Bari", City: "BARI", GroupName: "UNA Hotels", Type: "Business", Address: "SP57 Torre a Mare / Noicattaro, Noicattaro (BA)", Stars: 4, Breakfast: true},
+			{Name: "UNA Hotels Bologna Centro", City: "BOLOGNA", GroupName: "UNA Hotels", Type: "Business", Address: "Viale Pietro Pietramellara, 41, Bologna", Stars: 4, Breakfast: true},
+			{Name: "L'HERMITAGE", City: "LA BAULE", GroupName: "Barriere Group", Type: "Luxury", Address: "5 Espl. Lucien Barrière, 44500 La Baule-Escoublac, France", Stars: 5, Breakfast: true},
+			{Name: "Principi di Piemonte | UNA Esperienze", City: "TORINO", GroupName: "UNA Hotels", Type: "Luxury", Address: "Via Piero Gobetti, 15, 10123 Torino TO", Stars: 5, Breakfast: true},
+			{Name: "Le Majestic", City: "CANNES", GroupName: "Barriere Group", Type: "Luxury", Address: "10 Bd de la Croisette, Cannes", Stars: 5, Breakfast: true},
+			{Name: "Le Gray D'Albion", City: "CANNES", GroupName: "Barriere Group", Type: "Business", Address: "38 Rue des Serbes, Cannes", Stars: 4, Breakfast: true},
+			{Name: "Grand Hotel Minerva", City: "FLORENCE", GroupName: "Collezione EM", Type: "Boutique", Address: "P.za di Santa Maria Novella, 16, 50123 Firenze FI", Stars: 4, Breakfast: true},
+			{Name: "Brunelleschi Firenze", City: "FLORENCE", GroupName: "Collezione EM", Type: "Boutique", Address: "Piazza Sant'Elisabetta, 3, 50122 Firenze FI", Stars: 4, Breakfast: true},
+			{Name: "Pensione America", City: "FORTE DEI MARMI", GroupName: "Collezione EM", Type: "Luxury", Address: "Via Colombo, 24, 55042 Forte dei Marmi LU, Italy", Stars: 5, Breakfast: true},
 		}
 
 		for _, hotel := range hotels {

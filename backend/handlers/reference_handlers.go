@@ -49,24 +49,16 @@ func CreateHotel(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Stars must be between 1 and 5"})
 	}
 
-	// Проверка что текущие гости не превышают максимум
-	if req.CurrentGuests > req.MaxGuests {
-		return c.Status(400).JSON(fiber.Map{"error": "Current guests cannot exceed max guests"})
-	}
-
 	hotel := models.Hotel{
-		Name:          req.Name,
-		City:          req.City,
-		GroupName:     req.GroupName,
-		Type:          req.Type,
-		Stars:         req.Stars,
-		Address:       req.Address,
-		LocationLink:  req.LocationLink,
-		WebsiteLink:   req.WebsiteLink,
-		Breakfast:     req.Breakfast,
-		Price:         req.Price,
-		MaxGuests:     req.MaxGuests,
-		CurrentGuests: req.CurrentGuests,
+		Name:         req.Name,
+		City:         req.City,
+		GroupName:    req.GroupName,
+		Type:         req.Type,
+		Stars:        req.Stars,
+		Address:      req.Address,
+		LocationLink: req.LocationLink,
+		WebsiteLink:  req.WebsiteLink,
+		Breakfast:    req.Breakfast,
 	}
 
 	if err := database.DB.Create(&hotel).Error; err != nil {
@@ -97,10 +89,6 @@ func UpdateHotel(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Stars must be between 1 and 5"})
 	}
 
-	if req.CurrentGuests > req.MaxGuests {
-		return c.Status(400).JSON(fiber.Map{"error": "Current guests cannot exceed max guests"})
-	}
-
 	hotel.Name = req.Name
 	hotel.City = req.City
 	hotel.GroupName = req.GroupName
@@ -110,9 +98,6 @@ func UpdateHotel(c *fiber.Ctx) error {
 	hotel.LocationLink = req.LocationLink
 	hotel.WebsiteLink = req.WebsiteLink
 	hotel.Breakfast = req.Breakfast
-	hotel.Price = req.Price
-	hotel.MaxGuests = req.MaxGuests
-	hotel.CurrentGuests = req.CurrentGuests
 
 	if err := database.DB.Save(&hotel).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to update hotel", "details": err.Error()})

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -33,22 +32,28 @@ func CreateProposal(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Check-out date must be after check-in date"})
 	}
 
+	nights := int(checkOut.Sub(checkIn).Hours() / 24)
+	if nights != request.Nights {
+		return c.Status(400).JSON(fiber.Map{"error": "Nights calculation doesn't match date difference"})
+	}
+
 	var hotel models.Hotel
 	if err := database.DB.First(&hotel, request.HotelID).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Hotel not found"})
-	}
-
-	if request.Guests > hotel.MaxGuests-hotel.CurrentGuests {
-		return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("Not enough places. Hotel has %d available spots", hotel.MaxGuests-hotel.CurrentGuests)})
 	}
 
 	proposal := models.Proposal{
 		ProposalNumber: services.GenerateProposalNumber(),
 		ClientName:     request.ClientName,
 		Guests:         request.Guests,
+		Nights:         request.Nights,
+		NumberOfRooms:  request.NumberOfRooms,
+		RoomType:       request.RoomType,
 		CheckIn:        checkIn,
 		CheckOut:       checkOut,
 		Price:          request.Price,
+		Breakfast:      request.Breakfast,
+		FreeCancel:     request.FreeCancel,
 		HotelID:        request.HotelID,
 	}
 
@@ -106,20 +111,26 @@ func UpdateProposal(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Check-out date must be after check-in date"})
 	}
 
+	nights := int(checkOut.Sub(checkIn).Hours() / 24)
+	if nights != request.Nights {
+		return c.Status(400).JSON(fiber.Map{"error": "Nights calculation doesn't match date difference"})
+	}
+
 	var hotel models.Hotel
 	if err := database.DB.First(&hotel, request.HotelID).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Hotel not found"})
 	}
 
-	if request.Guests > hotel.MaxGuests-hotel.CurrentGuests {
-		return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("Not enough places. Hotel has %d available spots", hotel.MaxGuests-hotel.CurrentGuests)})
-	}
-
 	proposal.ClientName = request.ClientName
 	proposal.Guests = request.Guests
+	proposal.Nights = request.Nights
+	proposal.NumberOfRooms = request.NumberOfRooms
+	proposal.RoomType = request.RoomType
 	proposal.CheckIn = checkIn
 	proposal.CheckOut = checkOut
 	proposal.Price = request.Price
+	proposal.Breakfast = request.Breakfast
+	proposal.FreeCancel = request.FreeCancel
 	proposal.HotelID = request.HotelID
 
 	if err := database.DB.Save(&proposal).Error; err != nil {
