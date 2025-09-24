@@ -39,14 +39,16 @@ func CreateHotel(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request data"})
 	}
 
-	// Валидация обязательных полей
 	if req.Name == "" || req.Address == "" || req.City == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "Name, Address, and City are required"})
 	}
 
-	// Проверка диапазона звезд
 	if req.Stars < 1 || req.Stars > 5 {
 		return c.Status(400).JSON(fiber.Map{"error": "Stars must be between 1 and 5"})
+	}
+
+	if req.Type != "hotel" && req.Type != "apartment" {
+		return c.Status(400).JSON(fiber.Map{"error": "Type must be 'hotel' or 'apartment'"})
 	}
 
 	hotel := models.Hotel{
@@ -59,10 +61,11 @@ func CreateHotel(c *fiber.Ctx) error {
 		LocationLink: req.LocationLink,
 		WebsiteLink:  req.WebsiteLink,
 		Breakfast:    req.Breakfast,
+		ImageUrl:     req.ImageUrl,
 	}
 
 	if err := database.DB.Create(&hotel).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to create hotel", "details": err.Error()})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to create hotel"})
 	}
 
 	return c.Status(201).JSON(hotel)
@@ -70,23 +73,15 @@ func CreateHotel(c *fiber.Ctx) error {
 
 func UpdateHotel(c *fiber.Ctx) error {
 	id := c.Params("id")
-	var req models.CreateHotelRequest
 	var hotel models.Hotel
-
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "Invalid request data"})
-	}
 
 	if err := database.DB.First(&hotel, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Hotel not found"})
 	}
 
-	if req.Name == "" || req.Address == "" || req.City == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "Name, Address, and City are required"})
-	}
-
-	if req.Stars < 1 || req.Stars > 5 {
-		return c.Status(400).JSON(fiber.Map{"error": "Stars must be between 1 and 5"})
+	var req models.CreateHotelRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request data"})
 	}
 
 	hotel.Name = req.Name
@@ -98,9 +93,10 @@ func UpdateHotel(c *fiber.Ctx) error {
 	hotel.LocationLink = req.LocationLink
 	hotel.WebsiteLink = req.WebsiteLink
 	hotel.Breakfast = req.Breakfast
+	hotel.ImageUrl = req.ImageUrl
 
 	if err := database.DB.Save(&hotel).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to update hotel", "details": err.Error()})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update hotel"})
 	}
 
 	return c.JSON(hotel)
@@ -108,13 +104,8 @@ func UpdateHotel(c *fiber.Ctx) error {
 
 func DeleteHotel(c *fiber.Ctx) error {
 	id := c.Params("id")
-	var hotel models.Hotel
 
-	if err := database.DB.First(&hotel, id).Error; err != nil {
-		return c.Status(404).JSON(fiber.Map{"error": "Hotel not found"})
-	}
-
-	if err := database.DB.Delete(&hotel).Error; err != nil {
+	if err := database.DB.Delete(&models.Hotel{}, id).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete hotel"})
 	}
 

@@ -48,6 +48,7 @@ type Hotel struct {
 	LocationLink string `json:"location_link" gorm:"column:location_link"`
 	WebsiteLink  string `json:"website_link" gorm:"column:website_link"`
 	Breakfast    bool   `json:"breakfast" gorm:"column:breakfast;default:false"`
+	ImageUrl     string `json:"image_url" gorm:"column:image_url"`
 }
 
 type CarRental struct {
@@ -60,9 +61,6 @@ type Proposal struct {
 	ProposalNumber string    `json:"proposalNumber" gorm:"column:proposal_number"`
 	ClientName     string    `json:"clientName" gorm:"column:client_name"`
 	Guests         int       `json:"guests" gorm:"column:guests"`
-	Nights         int       `json:"nights" gorm:"column:nights"`
-	NumberOfRooms  int       `json:"numberOfRooms" gorm:"column:number_of_rooms"`
-	RoomType       string    `json:"roomType" gorm:"column:room_type"`
 	CheckIn        time.Time `json:"checkIn" gorm:"column:check_in"`
 	CheckOut       time.Time `json:"checkOut" gorm:"column:check_out"`
 	Price          float64   `json:"price" gorm:"column:price"`
@@ -72,7 +70,14 @@ type Proposal struct {
 	CreatedAt      time.Time `json:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt"`
 
-	Hotel *Hotel `json:"hotel" gorm:"foreignKey:HotelID"`
+	Hotel *Hotel         `json:"hotel" gorm:"foreignKey:HotelID"`
+	Rooms []ProposalRoom `json:"rooms" gorm:"foreignKey:ProposalID"`
+}
+
+type ProposalRoom struct {
+	ID         uint `json:"id" gorm:"primaryKey"`
+	ProposalID uint `json:"proposalId" gorm:"column:proposal_id"`
+	Count      int  `json:"count" gorm:"column:count"`
 }
 
 type CreateHotelRequest struct {
@@ -85,18 +90,21 @@ type CreateHotelRequest struct {
 	LocationLink string `json:"location_link"`
 	WebsiteLink  string `json:"website_link"`
 	Breakfast    bool   `json:"breakfast"`
+	ImageUrl     string `json:"image_url"`
 }
 
 type ProposalRequest struct {
-	ClientName    string  `json:"clientName"`
-	Guests        int     `json:"guests"`
-	Nights        int     `json:"nights"`
-	NumberOfRooms int     `json:"numberOfRooms"`
-	RoomType      string  `json:"roomType"`
-	CheckIn       string  `json:"checkIn"`
-	CheckOut      string  `json:"checkOut"`
-	Price         float64 `json:"price"`
-	Breakfast     bool    `json:"breakfast"`
-	FreeCancel    bool    `json:"freeCancel"`
-	HotelID       uint    `json:"hotelId"`
+	ClientName string        `json:"clientName"`
+	Guests     int           `json:"guests"`
+	CheckIn    string        `json:"checkIn"`
+	CheckOut   string        `json:"checkOut"`
+	Price      float64       `json:"price"`
+	Breakfast  bool          `json:"breakfast"`
+	FreeCancel bool          `json:"freeCancel"`
+	HotelID    uint          `json:"hotelId"`
+	Rooms      []RoomRequest `json:"rooms"`
+}
+
+type RoomRequest struct {
+	Count int `json:"count"`
 }
