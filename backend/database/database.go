@@ -35,10 +35,17 @@ func Connect() {
 }
 
 func Migrate() {
-	if err := DB.AutoMigrate(&models.Receipt{}, &models.Activity{}, &models.Hotel{}, &models.CarRental{}, &models.Proposal{}, &models.ProposalRoom{}); err != nil {
+	if err := DB.AutoMigrate(
+		&models.Receipt{},
+		&models.Activity{},
+		&models.Hotel{},
+		&models.HotelImage{},
+		&models.CarRental{},
+		&models.Proposal{},
+		&models.ProposalRoom{},
+	); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
-
 	log.Println("Database migrated successfully")
 }
 
@@ -103,13 +110,11 @@ func SeedData() {
 				HotelID:        1,
 			},
 		}
-
 		for _, proposal := range proposals {
 			if err := DB.Create(&proposal).Error; err != nil {
 				log.Printf("Failed to create proposal %s: %v", proposal.ProposalNumber, err)
 				continue
 			}
-
 			rooms := []models.ProposalRoom{
 				{ProposalID: proposal.ID, Count: 1},
 			}

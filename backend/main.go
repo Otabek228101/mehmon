@@ -21,6 +21,8 @@ func main() {
 
 	app := fiber.New()
 
+	app.Static("/uploads", "./uploads")
+
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE",
@@ -48,6 +50,10 @@ func setupRoutes(app *fiber.App) {
 	api.Post("/hotels", handlers.CreateHotel)
 	api.Put("/hotels/:id", handlers.UpdateHotel)
 	api.Delete("/hotels/:id", handlers.DeleteHotel)
+
+	api.Post("/hotels/:id/images", handlers.UploadHotelImages)
+	api.Get("/hotels/:id/images", handlers.GetHotelImages)
+	api.Get("/hotels/:id/images/base64", handlers.GetHotelImagesBase64)
 
 	api.Post("/proposals", handlers.CreateProposal)
 	api.Get("/proposals", handlers.GetProposals)
